@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>3D iPad Pocket Fishing</title>
+  <title>3D iPad Pocket Fishing - Ominous Night</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <style>
     * {
@@ -20,7 +20,7 @@
       width: 100%;
       height: 100%;
       overflow: hidden;
-      background-color: #000;
+      background-color: #020617;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     }
 
@@ -42,7 +42,6 @@
       height: 100%;
       z-index: 10;
       pointer-events: none;
-      /* Let touches pass through to canvas/buttons */
       display: flex;
       flex-direction: column;
       justify-content: space-between;
@@ -51,55 +50,62 @@
 
     .interactive {
       pointer-events: auto;
-      /* Re-enable touch for buttons */
     }
 
     #ui-bar {
       width: 100%;
       max-width: 500px;
       margin: 0 auto;
-      background: rgba(0, 0, 0, 0.6);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
+      background: rgba(2, 6, 23, 0.75);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
       border-radius: 16px;
       padding: 12px 20px;
       display: flex;
       justify-content: space-between;
-      border: 1px solid rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(239, 68, 68, 0.15);
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
     }
 
     .ui-text {
       font-size: 20px;
       font-weight: bold;
-      color: #fff;
+      color: #cbd5e1;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
     }
 
-    /* Massive iPad Friendly Button */
+    /* Textured Action Button */
     #action-btn {
       width: 85%;
       max-width: 340px;
       height: 75px;
       margin: 0 auto 15px auto;
-      background: linear-gradient(135deg, #4ade80, #22c55e);
-      border: none;
+      background-image: url('textures/button-cast-line.png');
+      background-size: cover;
+      background-position: center;
+      background-color: #1e293b; /* Fallback dark slate */
+      border: 2px solid #3f3f46;
       border-radius: 20px;
-      color: white;
+      color: #f1f5f9;
       font-size: 24px;
       font-weight: bold;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
-      transition: transform 0.05s;
+      letter-spacing: 1px;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.9);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.7), inset 0 2px 4px rgba(255, 255, 255, 0.1);
+      transition: transform 0.05s, filter 0.2s;
     }
 
     #action-btn:active {
       transform: scale(0.95);
+      filter: brightness(0.8);
     }
 
-    /* Inventory Table UI overlays right above the 3D table */
+    /* Inventory Table UI Overlay */
     #shop-overlay {
       width: 100%;
       max-width: 500px;
       margin: 0 auto;
-      background: rgba(0, 0, 0, 0.4);
+      background: rgba(15, 23, 42, 0.6);
       border-radius: 12px;
       padding: 10px;
       text-align: center;
@@ -107,48 +113,58 @@
       justify-content: center;
       align-items: center;
       gap: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
     }
 
     .fish-tag {
-      background: #fff;
-      color: #000;
+      background: #1e293b;
+      color: #cbd5e1;
       padding: 6px 12px;
       border-radius: 8px;
       font-weight: bold;
       font-size: 14px;
+      border: 1px solid #334155;
     }
 
     #sell-btn {
-      background: #f59e0b;
-      color: white;
-      border: none;
+      background: #7c2d12;
+      color: #fdba74;
+      border: 1px solid #9a3412;
       padding: 8px 16px;
       border-radius: 8px;
       font-weight: bold;
       font-size: 16px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
     }
 
-    /* Floating text feedback */
+    #sell-btn:active {
+      transform: scale(0.95);
+    }
+
+    /* Ominous Floating text feedback */
     .toast {
       position: absolute;
-      top: 40%;
+      top: 35%;
       left: 50%;
       transform: translate(-50%, -50%);
       color: #fff;
-      font-size: 32px;
+      font-size: 30px;
       font-weight: bold;
-      text-shadow: 0 4px 8px rgba(0, 0, 0, 0.8);
-      animation: floatUp 1.2s ease-out forwards;
+      letter-spacing: 1px;
+      text-shadow: 0 0 12px rgba(0, 0, 0, 1), 0 0 8px rgba(239, 68, 68, 0.4);
+      animation: floatUp 1.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
     }
 
     @keyframes floatUp {
       0% {
-        transform: translate(-50%, -50%) scale(0.8);
+        transform: translate(-50%, -30%) scale(0.85);
+        opacity: 0;
+      }
+      15% {
         opacity: 1;
       }
-
       100% {
-        transform: translate(-50%, -150%) scale(1.1);
+        transform: translate(-50%, -120%) scale(1.05);
         opacity: 0;
       }
     }
@@ -162,7 +178,7 @@
   <div id="ui-layer">
     <div id="ui-bar">
       <div class="ui-text" id="gold-display">🪙 Gold: 0</div>
-      <div class="ui-text" id="status-display">🎣 Ready</div>
+      <div class="ui-text" id="status-display">💀 The Depths Await</div>
     </div>
 
     <div id="alert-container"></div>
@@ -171,8 +187,8 @@
       <button id="action-btn" class="interactive">CAST LINE</button>
 
       <div id="shop-overlay">
-        <span id="inv-status" style="color: #bbb; font-style: italic;">3D Table Empty</span>
-        <button id="sell-btn" class="interactive" style="display: none;">SELL CATCH</button>
+        <span id="inv-status" style="color: #64748b; font-style: italic;">The altar is bare...</span>
+        <button id="sell-btn" class="interactive" style="display: none;">OFFER CATCH</button>
       </div>
     </div>
   </div>
@@ -186,93 +202,119 @@
     let windowTimeout = null;
 
     const fishTypes = [
-        { name: "🐟 Bluegill", value: 15 },
-        { name: "🐠 Bass", value: 35 },
-        { name: "🐡 Salmon", value: 75 },
-        { name: "🦈 Golden Koi", value: 200 }
+        { name: "👁️ Blind Eye", value: 20 },
+        { name: "🐟 Abyssal Dace", value: 45 },
+        { name: "🦑 Spine-Squid", value: 90 },
+        { name: "Leviathan Shard", value: 300 }
     ];
 
     // --- 3D Engine Setup ---
     const container = document.getElementById('canvas-container');
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0xa5f3fc); // Sky blue background
-    scene.fog = new THREE.FogExp2(0xa5f3fc, 0.05);
+    
+    // Ominous deep night void fog setup
+    scene.background = new THREE.Color(0x010409); 
+    scene.fog = new THREE.FogExp2(0x010409, 0.12);
 
     const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
-    // Dynamic angle looking down at the water and the selling table
-    camera.position.set(0, 7, 8);
-    camera.lookAt(0, 1, -2);
+    camera.position.set(0, 6.5, 7.5);
+    camera.lookAt(0, 0.8, -1.5);
 
     const renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.shadowMap.enabled = true;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 0.8;
     container.appendChild(renderer.domElement);
 
-    // --- Lighting ---
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+    // --- Ominous Lighting System ---
+    // Dim ambient moon/sky glow
+    const ambientLight = new THREE.AmbientLight(0x1e293b, 0.25);
     scene.add(ambientLight);
 
-    const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
-    dirLight.position.set(5, 10, 7);
-    dirLight.castShadow = true;
-    scene.add(dirLight);
+    // Sickly, pale moonlight casting deep shadows
+    const moonLight = new THREE.DirectionalLight(0x38bdf8, 0.4);
+    moonLight.position.set(-8, 12, -4);
+    moonLight.castShadow = true;
+    moonLight.shadow.mapSize.width = 1024;
+    moonLight.shadow.mapSize.height = 1024;
+    scene.add(moonLight);
 
-    // --- Create 3D Objects ---
+    // Crimson light bleeding up from the deep water
+    const abyssLight = new THREE.PointLight(0x7f1d1d, 1.5, 12);
+    abyssLight.position.set(0, -1.5, -3);
+    scene.add(abyssLight);
 
-    // 1. Water (The fishing zone)
-    const waterGeo = new THREE.PlaneGeometry(50, 50);
+    // Single localized dim spotlight illuminating the sales table
+    const tableSpotlight = new THREE.SpotLight(0xfef08a, 2.0, 10, Math.PI / 6, 0.5, 1);
+    tableSpotlight.position.set(0, 5, 4);
+    tableSpotlight.target.position.set(0, 0.5, 4);
+    scene.add(tableSpotlight);
+    scene.add(tableSpotlight.target);
+
+    // --- Create 3D Objects & Map Textures ---
+    const textureLoader = new THREE.TextureLoader();
+
+    // 1. Water (With requested water.png path adjustment)
+    const waterWaterTexture = textureLoader.load('textures/water.png', function(txt) {
+        txt.wrapS = THREE.RepeatWrapping;
+        txt.wrapT = THREE.RepeatWrapping;
+        txt.repeat.set(4, 4);
+    });
+
+    const waterGeo = new THREE.PlaneGeometry(60, 60);
     const waterMat = new THREE.MeshStandardMaterial({ 
-        color: 0x0284c7, 
-        roughness: 0.2, 
-        metalness: 0.1,
+        map: waterWaterTexture,
+        color: 0x0c1e36, // Deep ocean slate fallback base
+        roughness: 0.15, 
+        metalness: 0.4,
         transparent: true,
-        opacity: 0.85
+        opacity: 0.9
     });
     const water = new THREE.Mesh(waterGeo, waterMat);
     water.rotation.x = -Math.PI / 2;
     water.position.y = 0;
+    water.receiveShadow = true;
     scene.add(water);
 
-    // 2. The 3D Wooden Selling Table (Requested Table Texture implementation)
-    const textureLoader = new THREE.TextureLoader();
-    let tableMaterial;
-
-    // Load your custom texture. If file is missing locally, fallback neatly to a wood color style
-    const tableTexture = textureLoader.load('table_wood.png', 
-        function(texture) {
-            // Success: Apply settings once texture is grabbed successfully
-            texture.wrapS = THREE.RepeatWrapping;
-            texture.wrapT = THREE.RepeatWrapping;
-            texture.repeat.set(2, 1);
-        },
-        undefined,
-        function(err) {
-            console.log("Texture image not found, utilizing standard fallback styling.");
-        }
-    );
-
-    tableMaterial = new THREE.MeshStandardMaterial({
-        map: tableTexture,
-        color: 0x8b5a2b, // Fallback wooden hue color profile
-        roughness: 0.7
+    // 2. The 3D Wooden Selling Table (With requested textures/table_wood.png routing)
+    const tableTexture = textureLoader.load('textures/table_wood.png', function(txt) {
+        txt.wrapS = THREE.RepeatWrapping;
+        txt.wrapT = THREE.RepeatWrapping;
+        txt.repeat.set(2, 1);
     });
 
-    // Generate physical 3D Table Object right in front of camera view
-    const tableGeo = new THREE.BoxGeometry(5, 1.2, 2.5);
+    const tableMaterial = new THREE.MeshStandardMaterial({
+        map: tableTexture,
+        color: 0x271c19, // Decayed, dark rotted wood fallback tint
+        roughness: 0.8,
+        metalness: 0.1
+    });
+
+    const tableGeo = new THREE.BoxGeometry(4.8, 1.2, 2.2);
     const woodenTable = new THREE.Mesh(tableGeo, tableMaterial);
     woodenTable.position.set(0, 0.6, 4); 
     woodenTable.castShadow = true;
     woodenTable.receiveShadow = true;
     scene.add(woodenTable);
 
-    // 3. The 3D Fishing Bobber
-    const bobberGeo = new THREE.SphereGeometry(0.25, 16, 16);
-    const bobberMat = new THREE.MeshStandardMaterial({ color: 0xef4444, roughness: 0.4 });
+    // 3. Eerie Bioluminescent Fishing Bobber
+    const bobberGeo = new THREE.SphereGeometry(0.22, 16, 16);
+    const bobberMat = new THREE.MeshStandardMaterial({ 
+        color: 0xef4444,
+        emissive: 0x991b1b,
+        emissiveIntensity: 0.6,
+        roughness: 0.3 
+    });
     const bobber = new THREE.Mesh(bobberGeo, bobberMat);
-    bobber.position.set(0, -10, 0); // Hide below water initially
+    bobber.position.set(0, -10, 0); 
     scene.add(bobber);
 
-    // --- UI & Touch Handling (Fixed iOS Quirks) ---
+    // Neon bobber aura glow light
+    const bobberLight = new THREE.PointLight(0xef4444, 0, 4);
+    scene.add(bobberLight);
+
+    // --- UI & Touch Handling ---
     const actionBtn = document.getElementById("action-btn");
     const sellBtn = document.getElementById("sell-btn");
     const goldDisplay = document.getElementById("gold-display");
@@ -280,7 +322,6 @@
     const invStatus = document.getElementById("inv-status");
     const alertContainer = document.getElementById("alert-container");
 
-    // Seamless iPad Event Binding
     actionBtn.addEventListener("touchstart", function(e) {
         e.preventDefault();
         handleAction();
@@ -303,80 +344,82 @@
     // --- Game Logic Actions ---
     function castLine() {
         gameState = "casting";
-        statusDisplay.innerText = "Casting...";
+        statusDisplay.innerText = "Sinking into darkness...";
         actionBtn.innerText = "WAITING...";
-        actionBtn.style.background = "linear-gradient(135deg, #6b7280, #374151)";
+        actionBtn.style.filter = "grayscale(0.7) brightness(0.5)";
 
-        // Move 3D bobber into random coordinate out in water field
-        bobber.position.set((Math.random() - 0.5) * 4, 0.1, -(Math.random() * 3 + 2));
+        // Set position out in black water
+        bobber.position.set((Math.random() - 0.5) * 3.5, 0.1, -(Math.random() * 2.5 + 2));
+        bobberLight.position.copy(bobber.position);
+        bobberLight.intensity = 1.2;
 
         gameState = "waiting";
-        statusDisplay.innerText = "Watching...";
 
-        // Set random timing bite interval (2s - 4.5s)
-        const randomDelay = Math.random() * 2500 + 2000;
+        const randomDelay = Math.random() * 3000 + 2500;
         biteTimeout = setTimeout(fishBites, randomDelay);
     }
 
     function fishBites() {
         gameState = "nibble";
-        statusDisplay.innerText = "❗ STRIKE NOW! ❗";
-        actionBtn.innerText = "PULL!";
-        actionBtn.style.background = "linear-gradient(135deg, #ef4444, #b91c1c)";
+        statusDisplay.innerText = "⚠️ SOMETHING HAS IT! ⚠️";
+        actionBtn.innerText = "STRIKE!";
+        actionBtn.style.filter = "none";
+        actionBtn.style.border = "2px solid #ef4444";
 
-        // Native reaction window countdown (750 milliseconds)
         windowTimeout = setTimeout(() => {
             if (gameState === "nibble") {
                 fishEscaped();
             }
-        }, 750);
+        }, 650); // Snappy iPad reaction window
     }
 
     function catchFish() {
         clearTimeout(windowTimeout);
         gameState = "idle";
-        bobber.position.y = -10; // Hide bobber
+        bobber.position.y = -10; 
+        bobberLight.intensity = 0;
 
-        // Math random weight roll selection
         const roll = Math.random();
         let fish;
-        if (roll < 0.55) fish = fishTypes[0];      // Common
-        else if (roll < 0.85) fish = fishTypes[1]; // Uncommon
-        else if (roll < 0.96) fish = fishTypes[2]; // Rare
-        else fish = fishTypes[3];                 // Legendary
+        if (roll < 0.50) fish = fishTypes[0];      
+        else if (roll < 0.82) fish = fishTypes[1]; 
+        else if (roll < 0.96) fish = fishTypes[2]; 
+        else fish = fishTypes[3];                 
 
         inventory.push(fish);
-        spawnToast(`Caught ${fish.name}!`, "#4ade80");
+        spawnToast(`Pulled Up: ${fish.name}`, "#f87171");
         updateTableUI();
         resetControls();
     }
 
     function reeledEarly() {
         clearTimeout(biteTimeout);
-        spawnToast("Too early!", "#f43f5e");
+        spawnToast("Disturbed the water...", "#94a3b8");
         resetGame();
     }
 
     function fishEscaped() {
-        spawnToast("Got away...", "#9ca3af");
+        spawnToast("Dragged under...", "#64748b");
         resetGame();
     }
 
     function resetGame() {
         gameState = "idle";
         bobber.position.y = -10;
+        bobberLight.intensity = 0;
         resetControls();
     }
 
     function resetControls() {
-        statusDisplay.innerText = "🎣 Ready";
+        statusDisplay.innerText = "💀 The Depths Await";
         actionBtn.innerText = "CAST LINE";
-        actionBtn.style.background = "linear-gradient(135deg, #4ade80, #22c55e)";
+        actionBtn.style.filter = "none";
+        actionBtn.style.border = "2px solid #3f3f46";
     }
 
     function updateTableUI() {
         if(inventory.length === 0) {
-            invStatus.innerHTML = `<span style="color: #bbb; font-style: italic;">3D Table Empty</span>`;
+            invStatus.innerHTML = `<span style="color: #64748b; font-style: italic;">The altar is bare...</span>`;
             sellBtn.style.display = "none";
             return;
         }
@@ -398,7 +441,7 @@
         
         gold += payout;
         goldDisplay.innerText = `🪙 Gold: ${gold}`;
-        spawnToast(`+$${payout} Sold!`, "#fcd34d");
+        spawnToast(`Tribute Accepted (+$${payout})`, "#fef08a");
         
         inventory = [];
         updateTableUI();
@@ -410,7 +453,7 @@
         t.style.color = color;
         t.innerText = msg;
         alertContainer.appendChild(t);
-        setTimeout(() => t.remove(), 1200);
+        setTimeout(() => t.remove(), 1500);
     }
 
     // --- Animation Loop ---
@@ -421,20 +464,24 @@
         
         const time = clock.getElapsedTime();
 
-        // 3D Water animation wave effects
-        waterMat.opacity = 0.8 + Math.sin(time * 2) * 0.05;
+        // Animate the ominous dark water surface ripples
+        if (waterWaterTexture) {
+            waterWaterTexture.offset.x = time * 0.015;
+            waterWaterTexture.offset.y = time * 0.01;
+        }
 
-        // Make bobber bounce gently on water surface if waiting or splash wildly if biting
+        // Bobber float dynamics
         if (gameState === "waiting") {
-            bobber.position.y = 0.05 + Math.sin(time * 5) * 0.03;
+            bobber.position.y = 0.04 + Math.sin(time * 3.5) * 0.02;
+            bobberLight.intensity = 1.0 + Math.sin(time * 6) * 0.3; // Eerie pulsing light
         } else if (gameState === "nibble") {
-            bobber.position.y = -0.1 + Math.sin(time * 30) * 0.15;
+            bobber.position.y = -0.15 + Math.sin(time * 40) * 0.12; // Violent dynamic twitching
+            bobberLight.intensity = 2.0;
         }
 
         renderer.render(scene, camera);
     }
 
-    // Handle iPad rotation/resizing dynamically
     window.addEventListener('resize', onWindowResize, false);
     function onWindowResize() {
         camera.aspect = window.innerWidth / window.innerHeight;
@@ -442,7 +489,6 @@
         renderer.setSize(window.innerWidth, window.innerHeight);
     }
 
-    // Kickstart engine
     animate();
   </script>
 </body>
