@@ -3,363 +3,447 @@
 
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport"
-    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>Modular Canvas</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>3D iPad Pocket Fishing</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <style>
     * {
       box-sizing: border-box;
+      user-select: none;
+      -webkit-user-select: none;
       margin: 0;
       padding: 0;
-      touch-action: none;
     }
 
     body,
     html {
       width: 100%;
       height: 100%;
-      background: #ffffff;
-      font-family: monospace;
       overflow: hidden;
+      background-color: #000;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     }
 
-    canvas {
+    #canvas-container {
+      width: 100%;
+      height: 100%;
       position: absolute;
       top: 0;
       left: 0;
-      width: 100%;
-      height: 100%;
-      display: block;
-      background: #ffffff;
       z-index: 1;
     }
 
-    /* Ultra Minimal Floating Strip */
-    .toolbar {
-      position: fixed;
-      top: 12px;
-      right: 12px;
-      background: #ffffff;
-      border: 2px solid #000000;
-      padding: 4px 8px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      z-index: 10;
-      pointer-events: auto;
-    }
-
-    .group {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
-
-    .btn {
-      background: #ffffff;
-      border: 2px solid #000000;
-      padding: 4px 8px;
-      font-family: monospace;
-      font-size: 11px;
-      font-weight: bold;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #000000;
-    }
-
-    .btn:active,
-    .btn.active {
-      background: #000000;
-      color: #ffffff;
-    }
-
-    .btn svg {
-      width: 16px;
-      height: 16px;
-      stroke: currentColor;
-      fill: none;
-      stroke-width: 2.5;
-    }
-
-    .color-wrapper {
-      position: relative;
-      width: 22px;
-      height: 22px;
-      border: 2px solid #000000;
-    }
-
-    input[type="color"] {
+    /* UI Layer */
+    #ui-layer {
       position: absolute;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
+      z-index: 10;
+      pointer-events: none;
+      /* Let touches pass through to canvas/buttons */
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 20px;
+    }
+
+    .interactive {
+      pointer-events: auto;
+      /* Re-enable touch for buttons */
+    }
+
+    #ui-bar {
+      width: 100%;
+      max-width: 500px;
+      margin: 0 auto;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border-radius: 16px;
+      padding: 12px 20px;
+      display: flex;
+      justify-content: space-between;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .ui-text {
+      font-size: 20px;
+      font-weight: bold;
+      color: #fff;
+    }
+
+    /* Massive iPad Friendly Button */
+    #action-btn {
+      width: 85%;
+      max-width: 340px;
+      height: 75px;
+      margin: 0 auto 15px auto;
+      background: linear-gradient(135deg, #4ade80, #22c55e);
       border: none;
-      opacity: 0;
-      cursor: pointer;
-    }
-
-    select {
-      border: 2px solid #000000;
-      background: #ffffff;
-      font-family: monospace;
-      font-size: 11px;
+      border-radius: 20px;
+      color: white;
+      font-size: 24px;
       font-weight: bold;
-      color: #000000;
-      padding: 4px;
-      cursor: pointer;
-      outline: none;
-      -webkit-appearance: none;
-      border-radius: 0;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+      transition: transform 0.05s;
     }
 
-    /* Custom Modern Brutalist Select Component for Images */
-    .custom-select {
-      position: relative;
-      display: inline-block;
-      font-family: monospace;
-      font-size: 11px;
-      font-weight: bold;
+    #action-btn:active {
+      transform: scale(0.95);
     }
 
-    .select-trigger {
-      border: 2px solid #000000;
-      padding: 4px 24px 4px 6px;
-      background: #ffffff;
-      cursor: pointer;
+    /* Inventory Table UI overlays right above the 3D table */
+    #shop-overlay {
+      width: 100%;
+      max-width: 500px;
+      margin: 0 auto;
+      background: rgba(0, 0, 0, 0.4);
+      border-radius: 12px;
+      padding: 10px;
+      text-align: center;
       display: flex;
+      justify-content: center;
       align-items: center;
-      gap: 6px;
-      min-width: 140px;
+      gap: 10px;
     }
 
-    .select-trigger::after {
-      content: '▼';
-      position: absolute;
-      right: 6px;
-      top: 6px;
-      font-size: 8px;
-    }
-
-    .select-options {
-      display: none;
-      position: absolute;
-      top: 100%;
-      left: 0;
-      right: 0;
-      background: #ffffff;
-      border: 2px solid #000000;
-      border-top: none;
-      max-height: 240px;
-      overflow-y: auto;
-      z-index: 20;
-    }
-
-    .select-options.show {
-      display: block;
-    }
-
-    .option-item {
-      padding: 6px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      border-bottom: 1px solid #e0e0e0;
-    }
-
-    .option-item:hover {
-      background: #000000;
-      color: #ffffff;
-    }
-
-    .option-item img {
-      width: 35px;
-      height: 16px;
-      border: 1px solid #000000;
+    .fish-tag {
       background: #fff;
-      object-fit: cover;
+      color: #000;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-weight: bold;
+      font-size: 14px;
+    }
+
+    #sell-btn {
+      background: #f59e0b;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-weight: bold;
+      font-size: 16px;
+    }
+
+    /* Floating text feedback */
+    .toast {
+      position: absolute;
+      top: 40%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: #fff;
+      font-size: 32px;
+      font-weight: bold;
+      text-shadow: 0 4px 8px rgba(0, 0, 0, 0.8);
+      animation: floatUp 1.2s ease-out forwards;
+    }
+
+    @keyframes floatUp {
+      0% {
+        transform: translate(-50%, -50%) scale(0.8);
+        opacity: 1;
+      }
+
+      100% {
+        transform: translate(-50%, -150%) scale(1.1);
+        opacity: 0;
+      }
     }
   </style>
 </head>
 
 <body>
 
-  <canvas id="canvas"></canvas>
+  <div id="canvas-container"></div>
 
-  <div class="toolbar">
-    <div class="group">
-      <button class="btn active" id="penBtn" title="Draw">
-                <svg viewBox="0 0 24 24"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-            </button>
-      <button class="btn" id="eraserBtn" title="Erase">
-                <svg viewBox="0 0 24 24"><path d="M20 20H7L3 16c-1-1-1-3 0-4l9-9c1-1 3-1 4 0l4 4c1 1 1 3 0 4L12 20M15 5l4 4"/></svg>
-            </button>
+  <div id="ui-layer">
+    <div id="ui-bar">
+      <div class="ui-text" id="gold-display">🪙 Gold: 0</div>
+      <div class="ui-text" id="status-display">🎣 Ready</div>
     </div>
 
-    <div class="color-wrapper" id="colorIndicator">
-      <input type="color" id="colorPicker" value="#000000">
+    <div id="alert-container"></div>
+
+    <div style="display: flex; flex-direction: column; gap: 15px; width: 100%;">
+      <button id="action-btn" class="interactive">CAST LINE</button>
+
+      <div id="shop-overlay">
+        <span id="inv-status" style="color: #bbb; font-style: italic;">3D Table Empty</span>
+        <button id="sell-btn" class="interactive" style="display: none;">SELL CATCH</button>
+      </div>
     </div>
-
-    <div class="custom-select" id="customBrushSelect">
-      <div class="select-trigger" id="selectTrigger">Loading...</div>
-      <div class="select-options" id="selectOptions"></div>
-    </div>
-
-    <select id="strokeWidth">
-            <option value="2">TINY</option>
-            <option value="6" selected>MED</option>
-            <option value="16">WIDE</option>
-            <option value="45">HUGE</option>
-        </select>
-
-    <button class="btn" id="clearBtn" title="Clear">
-            <svg viewBox="0 0 24 24"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-        </button>
   </div>
 
-  <script src="brushes.js"></script>
   <script>
-    const canvas = document.getElementById('canvas');
-        const ctx = canvas.getContext('2d', { desynchronized: true });
-        
-        let isDrawing = false;
-        let points = [];
-        let mode = 'pen';
-        let activeBrushKey = 'gelPen';
-        let lastWidth = 6;
-        
-        const colorPicker = document.getElementById('colorPicker');
-        const colorIndicator = document.getElementById('colorIndicator');
-        const strokeWidth = document.getElementById('strokeWidth');
-        const penBtn = document.getElementById('penBtn');
-        const eraserBtn = document.getElementById('eraserBtn');
-        const clearBtn = document.getElementById('clearBtn');
-        
-        const selectTrigger = document.getElementById('selectTrigger');
-        const selectOptions = document.getElementById('selectOptions');
+    // --- Game Logic Variables ---
+    let gold = 0;
+    let inventory = [];
+    let gameState = "idle"; 
+    let biteTimeout = null;
+    let windowTimeout = null;
 
-        function resizeCanvas() {
-            const temp = document.createElement('canvas');
-            temp.width = canvas.width; temp.height = canvas.height;
-            temp.getContext('2d').drawImage(canvas, 0, 0);
-            const dpr = window.devicePixelRatio || 1;
-            canvas.width = window.innerWidth * dpr; canvas.height = window.innerHeight * dpr;
-            ctx.scale(dpr, dpr);
-            ctx.drawImage(temp, 0, 0, temp.width/dpr, temp.height/dpr);
-            ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+    const fishTypes = [
+        { name: "🐟 Bluegill", value: 15 },
+        { name: "🐠 Bass", value: 35 },
+        { name: "🐡 Salmon", value: 75 },
+        { name: "🦈 Golden Koi", value: 200 }
+    ];
+
+    // --- 3D Engine Setup ---
+    const container = document.getElementById('canvas-container');
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0xa5f3fc); // Sky blue background
+    scene.fog = new THREE.FogExp2(0xa5f3fc, 0.05);
+
+    const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+    // Dynamic angle looking down at the water and the selling table
+    camera.position.set(0, 7, 8);
+    camera.lookAt(0, 1, -2);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.shadowMap.enabled = true;
+    container.appendChild(renderer.domElement);
+
+    // --- Lighting ---
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+    scene.add(ambientLight);
+
+    const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+    dirLight.position.set(5, 10, 7);
+    dirLight.castShadow = true;
+    scene.add(dirLight);
+
+    // --- Create 3D Objects ---
+
+    // 1. Water (The fishing zone)
+    const waterGeo = new THREE.PlaneGeometry(50, 50);
+    const waterMat = new THREE.MeshStandardMaterial({ 
+        color: 0x0284c7, 
+        roughness: 0.2, 
+        metalness: 0.1,
+        transparent: true,
+        opacity: 0.85
+    });
+    const water = new THREE.Mesh(waterGeo, waterMat);
+    water.rotation.x = -Math.PI / 2;
+    water.position.y = 0;
+    scene.add(water);
+
+    // 2. The 3D Wooden Selling Table (Requested Table Texture implementation)
+    const textureLoader = new THREE.TextureLoader();
+    let tableMaterial;
+
+    // Load your custom texture. If file is missing locally, fallback neatly to a wood color style
+    const tableTexture = textureLoader.load('table_wood.png', 
+        function(texture) {
+            // Success: Apply settings once texture is grabbed successfully
+            texture.wrapS = THREE.RepeatWrapping;
+            texture.wrapT = THREE.RepeatWrapping;
+            texture.repeat.set(2, 1);
+        },
+        undefined,
+        function(err) {
+            console.log("Texture image not found, utilizing standard fallback styling.");
         }
+    );
 
-        // Procedural Mini-Renderer Engine to generate dropdown previews automatically
-        function generateBrushPreviews() {
-            selectOptions.innerHTML = '';
-            
-            Object.keys(Brushes).forEach(key => {
-                const b = Brushes[key];
-                
-                // Spin up an offscreen micro-canvas
-                const pCanvas = document.createElement('canvas');
-                pCanvas.width = 70; pCanvas.height = 32;
-                const pCtx = pCanvas.getContext('2d');
-                pCtx.lineCap = 'round'; pCtx.lineJoin = 'round';
-                
-                // Draw a standard test curve signature representing the stroke style
-                const p1 = { x: 5, y: 22, t: 0 };
-                const p2 = { x: 35, y: 8, t: 100 };
-                const p3 = { x: 65, y: 16, t: 200 };
-                
-                const dummyStyle = { color: '#000000', size: 6, lastWidth: 6 };
-                paintProceduralStroke(pCtx, p1, p2, b, dummyStyle, null);
-                paintProceduralStroke(pCtx, p2, p3, b, dummyStyle, null);
-                
-                const dataUrl = pCanvas.toDataURL();
-                
-                // Build options list element
-                const item = document.createElement('div');
-                item.className = 'option-item';
-                item.dataset.value = key;
-                item.innerHTML = `<img src="${dataUrl}" alt="swatch"> <span>${b.name}</span>`;
-                
-                item.addEventListener('click', () => {
-                    activeBrushKey = key;
-                    selectTrigger.innerHTML = item.innerHTML;
-                    selectOptions.classList.remove('show');
-                });
-                
-                selectOptions.appendChild(item);
-                
-                // Default fallback initialization
-                if (key === activeBrushKey) {
-                    selectTrigger.innerHTML = item.innerHTML;
-                }
-            });
+    tableMaterial = new THREE.MeshStandardMaterial({
+        map: tableTexture,
+        color: 0x8b5a2b, // Fallback wooden hue color profile
+        roughness: 0.7
+    });
+
+    // Generate physical 3D Table Object right in front of camera view
+    const tableGeo = new THREE.BoxGeometry(5, 1.2, 2.5);
+    const woodenTable = new THREE.Mesh(tableGeo, tableMaterial);
+    woodenTable.position.set(0, 0.6, 4); 
+    woodenTable.castShadow = true;
+    woodenTable.receiveShadow = true;
+    scene.add(woodenTable);
+
+    // 3. The 3D Fishing Bobber
+    const bobberGeo = new THREE.SphereGeometry(0.25, 16, 16);
+    const bobberMat = new THREE.MeshStandardMaterial({ color: 0xef4444, roughness: 0.4 });
+    const bobber = new THREE.Mesh(bobberGeo, bobberMat);
+    bobber.position.set(0, -10, 0); // Hide below water initially
+    scene.add(bobber);
+
+    // --- UI & Touch Handling (Fixed iOS Quirks) ---
+    const actionBtn = document.getElementById("action-btn");
+    const sellBtn = document.getElementById("sell-btn");
+    const goldDisplay = document.getElementById("gold-display");
+    const statusDisplay = document.getElementById("status-display");
+    const invStatus = document.getElementById("inv-status");
+    const alertContainer = document.getElementById("alert-container");
+
+    // Seamless iPad Event Binding
+    actionBtn.addEventListener("touchstart", function(e) {
+        e.preventDefault();
+        handleAction();
+    });
+    sellBtn.addEventListener("touchstart", function(e) {
+        e.preventDefault();
+        sellFish();
+    });
+
+    function handleAction() {
+        if (gameState === "idle") {
+            castLine();
+        } else if (gameState === "waiting") {
+            reeledEarly();
+        } else if (gameState === "nibble") {
+            catchFish();
         }
+    }
 
-        // Global Event listener closure toggle for drop menus
-        selectTrigger.addEventListener('click', (e) => {
-            e.stopPropagation();
-            selectOptions.classList.toggle('show');
-        });
-        document.addEventListener('click', () => selectOptions.classList.remove('show'));
+    // --- Game Logic Actions ---
+    function castLine() {
+        gameState = "casting";
+        statusDisplay.innerText = "Casting...";
+        actionBtn.innerText = "WAITING...";
+        actionBtn.style.background = "linear-gradient(135deg, #6b7280, #374151)";
 
-        function getCoordinates(e) {
-            const rect = canvas.getBoundingClientRect();
-            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-            return { x: clientX - rect.left, y: clientY - rect.top, t: Date.now() };
-        }
+        // Move 3D bobber into random coordinate out in water field
+        bobber.position.set((Math.random() - 0.5) * 4, 0.1, -(Math.random() * 3 + 2));
 
-        function startDrawing(e) {
-            isDrawing = true;
-            const pos = getCoordinates(e);
-            points = [pos];
-            colorIndicator.style.background = colorPicker.value;
-        }
+        gameState = "waiting";
+        statusDisplay.innerText = "Watching...";
 
-        function draw(e) {
-            if (!isDrawing) return;
-            e.preventDefault();
-            
-            const pos = getCoordinates(e);
-            points.push(pos);
+        // Set random timing bite interval (2s - 4.5s)
+        const randomDelay = Math.random() * 2500 + 2000;
+        biteTimeout = setTimeout(fishBites, randomDelay);
+    }
 
-            if (points.length > 1) {
-                const style = {
-                    color: mode === 'eraser' ? '#ffffff' : colorPicker.value,
-                    size: parseInt(strokeWidth.value),
-                    lastWidth: lastWidth
-                };
-                // Call externalized logic
-                lastWidth = paintProceduralStroke(ctx, points[points.length - 2], points[points.length - 1], Brushes[activeBrushKey], style, canvas);
+    function fishBites() {
+        gameState = "nibble";
+        statusDisplay.innerText = "❗ STRIKE NOW! ❗";
+        actionBtn.innerText = "PULL!";
+        actionBtn.style.background = "linear-gradient(135deg, #ef4444, #b91c1c)";
+
+        // Native reaction window countdown (750 milliseconds)
+        windowTimeout = setTimeout(() => {
+            if (gameState === "nibble") {
+                fishEscaped();
             }
-            if (points.length > 10) points.shift();
+        }, 750);
+    }
+
+    function catchFish() {
+        clearTimeout(windowTimeout);
+        gameState = "idle";
+        bobber.position.y = -10; // Hide bobber
+
+        // Math random weight roll selection
+        const roll = Math.random();
+        let fish;
+        if (roll < 0.55) fish = fishTypes[0];      // Common
+        else if (roll < 0.85) fish = fishTypes[1]; // Uncommon
+        else if (roll < 0.96) fish = fishTypes[2]; // Rare
+        else fish = fishTypes[3];                 // Legendary
+
+        inventory.push(fish);
+        spawnToast(`Caught ${fish.name}!`, "#4ade80");
+        updateTableUI();
+        resetControls();
+    }
+
+    function reeledEarly() {
+        clearTimeout(biteTimeout);
+        spawnToast("Too early!", "#f43f5e");
+        resetGame();
+    }
+
+    function fishEscaped() {
+        spawnToast("Got away...", "#9ca3af");
+        resetGame();
+    }
+
+    function resetGame() {
+        gameState = "idle";
+        bobber.position.y = -10;
+        resetControls();
+    }
+
+    function resetControls() {
+        statusDisplay.innerText = "🎣 Ready";
+        actionBtn.innerText = "CAST LINE";
+        actionBtn.style.background = "linear-gradient(135deg, #4ade80, #22c55e)";
+    }
+
+    function updateTableUI() {
+        if(inventory.length === 0) {
+            invStatus.innerHTML = `<span style="color: #bbb; font-style: italic;">3D Table Empty</span>`;
+            sellBtn.style.display = "none";
+            return;
         }
-
-        function stopDrawing() { isDrawing = false; points = []; }
-
-        if (window.PointerEvent) {
-            canvas.addEventListener('pointerdown', startDrawing);
-            canvas.addEventListener('pointermove', draw);
-            canvas.addEventListener('pointerup', stopDrawing);
-        } else {
-            canvas.addEventListener('touchstart', startDrawing);
-            canvas.addEventListener('touchmove', draw, { passive: false });
-            canvas.addEventListener('touchend', stopDrawing);
-        }
-
-        penBtn.addEventListener('click', () => { mode = 'pen'; penBtn.classList.add('active'); eraserBtn.classList.remove('active'); });
-        eraserBtn.addEventListener('click', () => { mode = 'eraser'; eraserBtn.classList.add('active'); penBtn.classList.remove('active'); });
-        clearBtn.addEventListener('click', () => { if(confirm("Clear?")) ctx.clearRect(0, 0, canvas.width, canvas.height); });
-        colorPicker.addEventListener('input', () => colorIndicator.style.background = colorPicker.value);
-
-        window.addEventListener('resize', resizeCanvas);
-        window.addEventListener('DOMContentLoaded', () => { 
-            resizeCanvas(); 
-            generateBrushPreviews();
-            colorIndicator.style.background = colorPicker.value;
+        
+        invStatus.innerHTML = "";
+        inventory.forEach(item => {
+            const span = document.createElement("span");
+            span.className = "fish-tag";
+            span.innerText = item.name;
+            invStatus.appendChild(span);
         });
+        sellBtn.style.display = "inline-block";
+    }
+
+    function sellFish() {
+        if(inventory.length === 0) return;
+        let payout = 0;
+        inventory.forEach(item => payout += item.value);
+        
+        gold += payout;
+        goldDisplay.innerText = `🪙 Gold: ${gold}`;
+        spawnToast(`+$${payout} Sold!`, "#fcd34d");
+        
+        inventory = [];
+        updateTableUI();
+    }
+
+    function spawnToast(msg, color) {
+        const t = document.createElement("div");
+        t.className = "toast";
+        t.style.color = color;
+        t.innerText = msg;
+        alertContainer.appendChild(t);
+        setTimeout(() => t.remove(), 1200);
+    }
+
+    // --- Animation Loop ---
+    let clock = new THREE.Clock();
+
+    function animate() {
+        requestAnimationFrame(animate);
+        
+        const time = clock.getElapsedTime();
+
+        // 3D Water animation wave effects
+        waterMat.opacity = 0.8 + Math.sin(time * 2) * 0.05;
+
+        // Make bobber bounce gently on water surface if waiting or splash wildly if biting
+        if (gameState === "waiting") {
+            bobber.position.y = 0.05 + Math.sin(time * 5) * 0.03;
+        } else if (gameState === "nibble") {
+            bobber.position.y = -0.1 + Math.sin(time * 30) * 0.15;
+        }
+
+        renderer.render(scene, camera);
+    }
+
+    // Handle iPad rotation/resizing dynamically
+    window.addEventListener('resize', onWindowResize, false);
+    function onWindowResize() {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+    }
+
+    // Kickstart engine
+    animate();
   </script>
 </body>
 
