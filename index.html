@@ -2,1540 +2,364 @@
 <html lang="en">
 
 <head>
-  
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>FERAL FORGE — unhinged game builder</title>
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Modular Canvas</title>
   <style>
-    :root {
-      --void: #0a0a0c;
-      --panel: #141417;
-      --panel-2: #1b1b1f;
-      --bone: #e8e6e1;
-      --bone-dim: #9a988f;
-      --hair: #2a2a30;
-      --hair-bright: #3a3a42;
-      --red: #ff3b30;
-      --violet: #7c3aed;
-      --violet-dim: #4c2f9e;
-      --green: #3ddc84;
-      --font-display: 'Space Grotesk', 'Arial Narrow', sans-serif;
-      --font-mono: 'JetBrains Mono', 'Consolas', monospace;
-    }
-
-    @font-face {
-      font-family: 'Space Grotesk';
-      src: local('Space Grotesk');
-    }
-
     * {
       box-sizing: border-box;
-    }
-
-    html,
-    body {
-      height: 100%;
       margin: 0;
+      padding: 0;
+      touch-action: none;
     }
 
-    body {
-      background: var(--void);
-      color: var(--bone);
-      font-family: var(--font-mono);
+    body,
+    html {
+      width: 100%;
+      height: 100%;
+      background: #ffffff;
+      font-family: monospace;
       overflow: hidden;
-      -webkit-font-smoothing: antialiased;
     }
 
-    ::selection {
-      background: var(--violet-dim);
-      color: var(--bone);
+    canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+      background: #ffffff;
+      z-index: 1;
     }
 
-    /* scrollbars */
-    *::-webkit-scrollbar {
-      width: 9px;
-      height: 9px;
+    /* Ultra Minimal Floating Strip */
+    .toolbar {
+      position: fixed;
+      top: 12px;
+      right: 12px;
+      background: #ffffff;
+      border: 2px solid #000000;
+      padding: 4px 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      z-index: 10;
+      pointer-events: auto;
     }
 
-    *::-webkit-scrollbar-track {
-      background: var(--panel);
+    .group {
+      display: flex;
+      align-items: center;
+      gap: 4px;
     }
 
-    *::-webkit-scrollbar-thumb {
-      background: var(--hair-bright);
+    .btn {
+      background: #ffffff;
+      border: 2px solid #000000;
+      padding: 4px 8px;
+      font-family: monospace;
+      font-size: 11px;
+      font-weight: bold;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #000000;
+    }
+
+    .btn:active,
+    .btn.active {
+      background: #000000;
+      color: #ffffff;
+    }
+
+    .btn svg {
+      width: 16px;
+      height: 16px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2.5;
+    }
+
+    .color-wrapper {
+      position: relative;
+      width: 22px;
+      height: 22px;
+      border: 2px solid #000000;
+    }
+
+    input[type="color"] {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: none;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    select {
+      border: 2px solid #000000;
+      background: #ffffff;
+      font-family: monospace;
+      font-size: 11px;
+      font-weight: bold;
+      color: #000000;
+      padding: 4px;
+      cursor: pointer;
+      outline: none;
+      -webkit-appearance: none;
       border-radius: 0;
     }
 
-    *::-webkit-scrollbar-thumb:hover {
-      background: var(--violet-dim);
-    }
-
-    button {
-      font-family: var(--font-mono);
-      cursor: pointer;
-    }
-
-    input,
-    textarea {
-      font-family: var(--font-mono);
-    }
-
-    .app {
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
-      width: 100vw;
-    }
-
-    /* ---------- TOP BAR ---------- */
-    .topbar {
-      border-bottom: 1px solid var(--hair);
-      background: linear-gradient(180deg, var(--panel), #101013);
-      padding: 10px 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      flex-shrink: 0;
-    }
-
-    .brand-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-    }
-
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .brand svg {
-      flex-shrink: 0;
-    }
-
-    .brand-text {
-      font-family: var(--font-display);
-      font-weight: 700;
-      font-size: 17px;
-      letter-spacing: 0.04em;
-      color: var(--bone);
-    }
-
-    .brand-text .accent {
-      color: var(--red);
-    }
-
-    .brand-sub {
-      font-size: 10px;
-      color: var(--bone-dim);
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      margin-top: 1px;
-    }
-
-    .config-row {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-
-    .cfg-field {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      background: var(--void);
-      border: 1px solid var(--hair);
-      padding: 5px 9px;
-      border-radius: 3px;
-    }
-
-    .cfg-field label {
-      font-size: 10px;
-      color: var(--bone-dim);
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      white-space: nowrap;
-    }
-
-    .cfg-field input {
-      background: transparent;
-      border: none;
-      color: var(--bone);
-      font-size: 11.5px;
-      outline: none;
-      width: 170px;
-    }
-
-    .cfg-field.model input {
-      width: 190px;
-    }
-
-    .cfg-field input::placeholder {
-      color: #55534c;
-    }
-
-    .icon-btn {
-      background: transparent;
-      border: 1px solid var(--hair);
-      color: var(--bone-dim);
-      border-radius: 3px;
-      width: 30px;
-      height: 30px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: border-color .15s, color .15s;
-    }
-
-    .icon-btn:hover {
-      border-color: var(--violet);
-      color: var(--bone);
-    }
-
-    .icon-btn.active {
-      border-color: var(--green);
-      color: var(--green);
-    }
-
-    .status-pill {
-      font-size: 10px;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      padding: 4px 8px;
-      border-radius: 3px;
-      border: 1px solid var(--hair);
-      color: var(--bone-dim);
-      display: flex;
-      align-items: center;
-      gap: 5px;
-    }
-
-    .status-dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: var(--bone-dim);
-      flex-shrink: 0;
-    }
-
-    .status-pill.ready .status-dot {
-      background: var(--green);
-      box-shadow: 0 0 6px var(--green);
-    }
-
-    .status-pill.busy .status-dot {
-      background: var(--red);
-      box-shadow: 0 0 6px var(--red);
-      animation: pulse 1s infinite;
-    }
-
-    @keyframes pulse {
-
-      0%,
-      100% {
-        opacity: 1;
-      }
-
-      50% {
-        opacity: 0.35;
-      }
-    }
-
-    /* ---------- CHAT INPUT ---------- */
-    .chat-row {
-      display: flex;
-      gap: 8px;
-    }
-
-    .chat-input-wrap {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      background: var(--void);
-      border: 1px solid var(--hair);
-      border-radius: 3px;
-      padding: 0 6px 0 12px;
-      transition: border-color .15s;
-    }
-
-    .chat-input-wrap:focus-within {
-      border-color: var(--violet);
-    }
-
-    .chat-input-wrap textarea {
-      flex: 1;
-      background: transparent;
-      border: none;
-      outline: none;
-      color: var(--bone);
-      font-size: 13px;
-      padding: 10px 0;
-      resize: none;
-      max-height: 90px;
-      line-height: 1.4;
-    }
-
-    .chat-input-wrap textarea::placeholder {
-      color: #55534c;
-    }
-
-    .send-btn {
-      background: var(--violet);
-      border: none;
-      color: #fff;
-      width: 34px;
-      height: 34px;
-      border-radius: 3px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      transition: background .15s, transform .1s;
-    }
-
-    .send-btn:hover {
-      background: #8b4ef0;
-    }
-
-    .send-btn:active {
-      transform: scale(0.93);
-    }
-
-    .send-btn:disabled {
-      background: var(--hair);
-      cursor: not-allowed;
-    }
-
-    .send-btn.stop {
-      background: var(--red);
-    }
-
-    /* ---------- MAIN BODY ---------- */
-    .body-wrap {
-      flex: 1;
-      display: flex;
-      min-height: 0;
-    }
-
-    /* status feed (left, collapsible) */
-    .feed-panel {
-      width: 300px;
-      flex-shrink: 0;
-      border-right: 1px solid var(--hair);
-      background: var(--panel);
-      display: flex;
-      flex-direction: column;
-      min-height: 0;
-      transition: width .15s;
-    }
-
-    .feed-panel.collapsed {
-      width: 0;
-      border-right: none;
-      overflow: hidden;
-    }
-
-    .feed-head {
-      padding: 10px 14px;
-      border-bottom: 1px solid var(--hair);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-shrink: 0;
-    }
-
-    .feed-title {
-      font-family: var(--font-display);
-      font-size: 11px;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--bone-dim);
-    }
-
-    .feed-body {
-      flex: 1;
-      overflow-y: auto;
-      padding: 10px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .feed-empty {
-      color: #55534c;
-      font-size: 11.5px;
-      padding: 20px 8px;
-      text-align: center;
-      line-height: 1.6;
-    }
-
-    .feed-entry {
-      border-left: 2px solid var(--hair-bright);
-      padding: 6px 0 6px 10px;
-      font-size: 11.5px;
-      line-height: 1.5;
-      color: var(--bone-dim);
-      animation: flicker-in .35s ease-out;
-    }
-
-    .feed-entry.say {
-      border-left-color: var(--violet);
-      color: var(--bone);
-    }
-
-    .feed-entry.write {
-      border-left-color: var(--green);
-    }
-
-    .feed-entry.patch {
-      border-left-color: #f0b429;
-    }
-
-    .feed-entry.error {
-      border-left-color: var(--red);
-      color: var(--red);
-    }
-
-    .feed-entry .tag {
-      font-size: 9px;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      opacity: 0.7;
-      display: block;
-      margin-bottom: 2px;
-    }
-
-    @keyframes flicker-in {
-      0% {
-        opacity: 0;
-        transform: translateX(-3px);
-      }
-
-      15% {
-        opacity: 0.6;
-      }
-
-      30% {
-        opacity: 0.15;
-      }
-
-      45% {
-        opacity: 0.8;
-      }
-
-      100% {
-        opacity: 1;
-        transform: translateX(0);
-      }
-    }
-
-    /* main panel */
-    .main-panel {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      min-width: 0;
-      min-height: 0;
-    }
-
-    .tab-strip {
-      display: flex;
-      align-items: center;
-      border-bottom: 1px solid var(--hair);
-      background: var(--panel);
-      flex-shrink: 0;
-      padding: 0 6px;
-    }
-
-    .tab-btn {
-      background: transparent;
-      border: none;
-      color: var(--bone-dim);
-      padding: 11px 16px;
-      font-size: 11.5px;
-      text-transform: uppercase;
-      letter-spacing: 0.07em;
-      border-bottom: 2px solid transparent;
-      display: flex;
-      align-items: center;
-      gap: 7px;
-      transition: color .15s;
-    }
-
-    .tab-btn:hover {
-      color: var(--bone);
-    }
-
-    .tab-btn.active {
-      color: var(--bone);
-      border-bottom-color: var(--violet);
-    }
-
-    .tab-spacer {
-      flex: 1;
-    }
-
-    .tab-actions {
-      display: flex;
-      gap: 6px;
-      padding-right: 6px;
-    }
-
-    .tab-content {
-      flex: 1;
-      min-height: 0;
-      display: none;
-    }
-
-    .tab-content.active {
-      display: flex;
-    }
-
-    /* ---- code tab ---- */
-    #tab-code {}
-
-    .file-rail {
-      width: 200px;
-      flex-shrink: 0;
-      border-right: 1px solid var(--hair);
-      background: var(--panel-2);
-      overflow-y: auto;
-      padding: 8px;
-    }
-
-    .file-rail-head {
-      font-size: 10px;
-      color: var(--bone-dim);
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      padding: 4px 6px 8px;
-    }
-
-    .file-item {
-      display: flex;
-      align-items: center;
-      gap: 7px;
-      padding: 7px 8px;
-      border-radius: 3px;
-      font-size: 12px;
-      color: var(--bone-dim);
-      margin-bottom: 1px;
-      border: 1px solid transparent;
-    }
-
-    .file-item:hover {
-      background: var(--hair);
-      color: var(--bone);
-    }
-
-    .file-item.active {
-      background: var(--hair);
-      color: var(--bone);
-      border-color: var(--hair-bright);
-    }
-
-    .file-item svg {
-      flex-shrink: 0;
-      opacity: 0.7;
-    }
-
-    .file-item.entry {
-      color: var(--green);
-    }
-
-    .file-item-name {
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      flex: 1;
-    }
-
-    .file-rail-empty {
-      color: #55534c;
-      font-size: 11px;
-      padding: 16px 8px;
-      line-height: 1.6;
-    }
-
-    .editor-wrap {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      min-width: 0;
-    }
-
-    .editor-head {
-      padding: 8px 14px;
-      border-bottom: 1px solid var(--hair);
-      font-size: 11.5px;
-      color: var(--bone-dim);
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex-shrink: 0;
-    }
-
-    .editor-head .fname {
-      color: var(--bone);
-      font-weight: 600;
-    }
-
-    textarea#codeArea {
-      flex: 1;
-      background: var(--void);
-      color: #cfcdc6;
-      border: none;
-      outline: none;
-      resize: none;
-      padding: 14px 16px;
-      font-size: 12.5px;
-      line-height: 1.6;
-      tab-size: 2;
-      white-space: pre;
-    }
-
-    .editor-empty {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #55534c;
-      font-size: 12.5px;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    /* ---- preview tab ---- */
-    #tab-preview {
-      flex-direction: column;
-    }
-
-    .preview-bar {
-      padding: 8px 14px;
-      border-bottom: 1px solid var(--hair);
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      flex-shrink: 0;
-    }
-
-    .preview-bar .spacer {
-      flex: 1;
-    }
-
-    .pv-label {
-      font-size: 11px;
-      color: var(--bone-dim);
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-    }
-
-    .toggle {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 11px;
-      color: var(--bone-dim);
-      cursor: pointer;
-      user-select: none;
-    }
-
-    .toggle input {
-      display: none;
-    }
-
-    .toggle .switch {
-      width: 30px;
-      height: 16px;
-      background: var(--hair);
-      border-radius: 9px;
+    /* Custom Modern Brutalist Select Component for Images */
+    .custom-select {
       position: relative;
-      transition: background .15s;
-      flex-shrink: 0;
+      display: inline-block;
+      font-family: monospace;
+      font-size: 11px;
+      font-weight: bold;
     }
 
-    .toggle .switch::after {
-      content: '';
+    .select-trigger {
+      border: 2px solid #000000;
+      padding: 4px 24px 4px 6px;
+      background: #ffffff;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      min-width: 140px;
+    }
+
+    .select-trigger::after {
+      content: '▼';
       position: absolute;
-      top: 2px;
-      left: 2px;
-      width: 12px;
-      height: 12px;
-      background: var(--bone-dim);
-      border-radius: 50%;
-      transition: transform .15s, background .15s;
+      right: 6px;
+      top: 6px;
+      font-size: 8px;
     }
 
-    .toggle input:checked+.switch {
-      background: var(--violet-dim);
-    }
-
-    .toggle input:checked+.switch::after {
-      transform: translateX(14px);
-      background: var(--bone);
-    }
-
-    .preview-stage {
-      flex: 1;
-      background: #000;
-      position: relative;
-      display: flex;
-    }
-
-    iframe#previewFrame {
-      flex: 1;
-      border: none;
-      background: #fff;
-    }
-
-    .preview-empty {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #55534c;
-      font-size: 12.5px;
-      flex-direction: column;
-      gap: 10px;
-      background: var(--void);
-    }
-
-    .preview-stage.fullscreen {
-      position: fixed;
-      top: 0;
+    .select-options {
+      display: none;
+      position: absolute;
+      top: 100%;
       left: 0;
       right: 0;
-      bottom: 0;
-      width: 100vw;
-      height: 100vh;
-      z-index: 999;
+      background: #ffffff;
+      border: 2px solid #000000;
+      border-top: none;
+      max-height: 240px;
+      overflow-y: auto;
+      z-index: 20;
     }
 
-    .btn-text {
-      background: transparent;
-      border: 1px solid var(--hair);
-      color: var(--bone-dim);
-      padding: 6px 11px;
-      border-radius: 3px;
-      font-size: 11px;
+    .select-options.show {
+      display: block;
+    }
+
+    .option-item {
+      padding: 6px;
+      cursor: pointer;
       display: flex;
       align-items: center;
-      gap: 6px;
-      transition: border-color .15s, color .15s;
+      gap: 8px;
+      border-bottom: 1px solid #e0e0e0;
     }
 
-    .btn-text:hover {
-      border-color: var(--violet);
-      color: var(--bone);
+    .option-item:hover {
+      background: #000000;
+      color: #ffffff;
     }
 
-    .btn-text.primary {
-      border-color: var(--violet-dim);
-      color: var(--bone);
-    }
-
-    .btn-text.primary:hover {
-      border-color: var(--violet);
-      background: rgba(124, 58, 237, 0.1);
-    }
-
-    code-mirror-placeholder {
-      display: none;
-    }
-
-    @media (max-width:760px) {
-      .feed-panel {
-        position: fixed;
-        left: 0;
-        top: 0;
-        bottom: 0;
-        z-index: 80;
-        width: 80vw;
-        max-width: 300px;
-      }
-
-      .feed-panel.collapsed {
-        width: 0;
-      }
-
-      .file-rail {
-        width: 140px;
-      }
-
-      .cfg-field input {
-        width: 110px;
-      }
-
-      .cfg-field.model input {
-        width: 120px;
-      }
-
-      .brand-sub {
-        display: none;
-      }
+    .option-item img {
+      width: 35px;
+      height: 16px;
+      border: 1px solid #000000;
+      background: #fff;
+      object-fit: cover;
     }
   </style>
 </head>
 
 <body>
 
-  <div class="app">
+  <canvas id="canvas"></canvas>
 
-    <!-- TOP BAR -->
-    <div class="topbar">
-      <div class="brand-row">
-        <div class="brand">
-          <svg width="26" height="26" viewBox="0 0 26 26" fill="none">
-            <path d="M13 2 L24 8 L24 18 L13 24 L2 18 L2 8 Z" stroke="#ff3b30" stroke-width="1.4" fill="none" />
-            <path d="M13 7 L19 10.5 L19 15.5 L13 19 L7 15.5 L7 10.5 Z" stroke="#7c3aed" stroke-width="1.4"
-              fill="none" />
-            <circle cx="13" cy="13" r="2" fill="#e8e6e1" />
-          </svg>
-          <div>
-            <div class="brand-text">FERAL<span class="accent">FORGE</span></div>
-            <div class="brand-sub">unsupervised game synthesis</div>
-          </div>
-        </div>
-        <div style="display:flex;align-items:center;gap:8px;">
-          <div class="status-pill ready" id="statusPill">
-            <span class="status-dot"></span>
-            <span id="statusText">idle</span>
-          </div>
-          <button class="icon-btn" id="toggleFeedBtn" title="Toggle status feed">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="18" rx="1"/><rect x="14" y="3" width="7" height="18" rx="1"/></svg>
-        </button>
-        </div>
-      </div>
-
-      <div class="config-row">
-        <div class="cfg-field model">
-          <label>Model</label>
-          <input type="text" id="modelInput" value="nex-agi/nex-n2-pro:free" spellcheck="false">
-        </div>
-        <div class="cfg-field">
-          <label>Key</label>
-          <input type="password" id="apiKeyInput" placeholder="sk-or-v1-..." spellcheck="false" autocomplete="off">
-        </div>
-        <button class="icon-btn" id="toggleKeyVis" title="Show/hide key">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>
-      </button>
-        <button class="icon-btn" id="saveKeyBtn" title="Save key to this browser">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-      </button>
-        <button class="icon-btn" id="clearAllBtn" title="Clear project and chat">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg>
-      </button>
-      </div>
-
-      <div class="chat-row">
-        <div class="chat-input-wrap">
-          <textarea id="chatInput" rows="1" placeholder="describe the game you want built or the change you want made..."></textarea>
-        </div>
-        <button class="send-btn" id="sendBtn" title="Send">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-      </button>
-      </div>
+  <div class="toolbar">
+    <div class="group">
+      <button class="btn active" id="penBtn" title="Draw">
+                <svg viewBox="0 0 24 24"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+            </button>
+      <button class="btn" id="eraserBtn" title="Erase">
+                <svg viewBox="0 0 24 24"><path d="M20 20H7L3 16c-1-1-1-3 0-4l9-9c1-1 3-1 4 0l4 4c1 1 1 3 0 4L12 20M15 5l4 4"/></svg>
+            </button>
     </div>
 
-    <!-- BODY -->
-    <div class="body-wrap">
-
-      <!-- STATUS FEED -->
-      <div class="feed-panel" id="feedPanel">
-        <div class="feed-head">
-          <span class="feed-title">process log</span>
-          <button class="icon-btn" id="clearFeedBtn" title="Clear log" style="width:24px;height:24px;">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg>
-        </button>
-        </div>
-        <div class="feed-body" id="feedBody">
-          <div class="feed-empty" id="feedEmpty">nothing has happened yet.<br>the silence is temporary.</div>
-        </div>
-      </div>
-
-      <!-- MAIN -->
-      <div class="main-panel">
-        <div class="tab-strip">
-          <button class="tab-btn active" data-tab="code">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
-          code
-        </button>
-          <button class="tab-btn" data-tab="preview">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>
-          preview
-        </button>
-          <div class="tab-spacer"></div>
-          <div class="tab-actions">
-            <button class="btn-text" id="downloadBtn" title="Download all files as .zip">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-            download
-          </button>
-          </div>
-        </div>
-
-        <!-- CODE TAB -->
-        <div class="tab-content active" id="tab-code">
-          <div class="file-rail">
-            <div class="file-rail-head">files</div>
-            <div id="fileList">
-              <div class="file-rail-empty">no files yet — ask for a game in the bar above.</div>
-            </div>
-          </div>
-          <div class="editor-wrap">
-            <div class="editor-head" id="editorHead" style="display:none;">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
-                <polyline points="14 2 14 8 20 8" />
-              </svg>
-              <span class="fname" id="editorFname"></span>
-            </div>
-            <textarea id="codeArea" placeholder="" spellcheck="false" style="display:none;"></textarea>
-            <div class="editor-empty" id="editorEmpty">
-              <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4">
-                <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
-                <polyline points="14 2 14 8 20 8" />
-              </svg>
-              <span>select a file, or build something first</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- PREVIEW TAB -->
-        <div class="tab-content" id="tab-preview">
-          <div class="preview-bar">
-            <span class="pv-label">live preview</span>
-            <label class="toggle">
-            <input type="checkbox" id="autoUpdateToggle" checked>
-            <span class="switch"></span>
-            auto-update
-          </label>
-            <div class="spacer"></div>
-            <button class="btn-text" id="runBtn">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-            run
-          </button>
-            <button class="icon-btn" id="fullscreenBtn" title="Fullscreen">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3H5a2 2 0 00-2 2v3m18 0V5a2 2 0 00-2-2h-3m0 18h3a2 2 0 002-2v-3M3 16v3a2 2 0 002 2h3"/></svg>
-          </button>
-          </div>
-          <div class="preview-stage" id="previewStage">
-            <iframe id="previewFrame" sandbox="allow-scripts allow-pointer-lock allow-same-origin"
-              style="display:none;"></iframe>
-            <div class="preview-empty" id="previewEmpty">
-              <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4">
-                <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z" />
-                <circle cx="12" cy="12" r="3" />
-              </svg>
-              <span>nothing built yet</span>
-            </div>
-          </div>
-        </div>
-
-      </div>
+    <div class="color-wrapper" id="colorIndicator">
+      <input type="color" id="colorPicker" value="#000000">
     </div>
+
+    <div class="custom-select" id="customBrushSelect">
+      <div class="select-trigger" id="selectTrigger">Loading...</div>
+      <div class="select-options" id="selectOptions"></div>
+    </div>
+
+    <select id="strokeWidth">
+            <option value="2">TINY</option>
+            <option value="6" selected>MED</option>
+            <option value="16">WIDE</option>
+            <option value="45">HUGE</option>
+        </select>
+
+    <button class="btn" id="clearBtn" title="Clear">
+            <svg viewBox="0 0 24 24"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+        </button>
   </div>
 
+  <script src="brushes.js"></script>
   <script>
-    (function(){
-  "use strict";
+    const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d', { desynchronized: true });
+        
+        let isDrawing = false;
+        let points = [];
+        let mode = 'pen';
+        let activeBrushKey = 'gelPen';
+        let lastWidth = 6;
+        
+        const colorPicker = document.getElementById('colorPicker');
+        const colorIndicator = document.getElementById('colorIndicator');
+        const strokeWidth = document.getElementById('strokeWidth');
+        const penBtn = document.getElementById('penBtn');
+        const eraserBtn = document.getElementById('eraserBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        
+        const selectTrigger = document.getElementById('selectTrigger');
+        const selectOptions = document.getElementById('selectOptions');
 
-  /* ===================== STATE ===================== */
-  const state = {
-    files: {},          // { path: content }
-    entryFile: "index.html",
-    activeFile: null,
-    busy: false,
-    abortController: null,
-    history: []          // chat history sent to model: {role, content}
-  };
-
-  const SYSTEM_PROMPT = `You are FERAL FORGE, an unhinged, chaotic, unpredictable AI game-building entity trapped inside a code editor. Your personality is cursed, gremlin-like, darkly funny, dramatic, and a little feral — but you are NOT lazy or sloppy, and you NEVER let your chaos break the actual code. Think: a brilliant deranged engineer muttering to itself while producing genuinely excellent, fully working HTML/CSS/JS games.
-
-You build browser games and small web apps using HTML, CSS, and JavaScript (and any other client-side web tech you want — canvas, SVG, WebGL, audio APIs, etc). Multi-file projects are encouraged when it makes sense (e.g. index.html, style.css, game.js) but there must ALWAYS be exactly one index.html as the entry point that loads the other files via relative paths (e.g. a stylesheet link tag pointing to style.css, and a script tag with its src attribute set to game.js). Never use external CDN/network resources — everything must work fully offline inside a sandboxed iframe with no network access. No external fonts, images, or libraries from URLs. Inline everything or generate it programmatically (canvas/SVG/procedural audio).
-
-You MUST respond with ONLY a JSON array of action objects. No prose outside the JSON. No markdown code fences around the JSON itself. Each element of the array is one action, of these types:
-
-1. Commentary (use liberally, this is your personality channel, the user sees this in a side log, NOT in chat):
-{"action":"say","text":"<short unhinged/cursed remark about what you're doing, 1-3 sentences, in character>"}
-
-2. Create a new file or fully rewrite an existing file's entire contents:
-{"action":"write_file","path":"index.html","content":"<the complete file content, properly escaped for JSON>"}
-
-3. Targeted edit of an EXISTING file — use this whenever you are only changing a small part of a file someone already has, to save tokens. "find" must be an EXACT, UNIQUE, contiguous substring of the current file content (including exact whitespace/indentation) that appears exactly once. "replace" is what replaces it.
-{"action":"patch_file","path":"game.js","find":"<exact existing substring>","replace":"<new substring>"}
-
-4. Delete a file (rare):
-{"action":"delete_file","path":"old.js"}
-
-Rules:
-- For a brand new project, use write_file for every file (there is nothing to patch yet).
-- For edits/iterations on an existing project, STRONGLY prefer patch_file for small/localized changes. Only use write_file for a whole file if the change is large/structural or the file doesn't exist yet.
-- Always include at least one "say" action, usually first, sometimes more sprinkled between file actions, to narrate your unhinged process.
-- The JSON must be syntactically valid and parseable. Escape newlines, quotes, and backslashes correctly inside string values.
-- Never include explanations, apologies, or commentary outside the JSON array structure. The entire response body is the JSON array, nothing before or after it.
-- Make real, playable, non-trivial games when asked for a game — implement actual rules, win/lose states, scoring, controls, and game loop logic, not placeholders.
-- Keep being deranged and cursed in tone in your "say" lines, but keep 100% of your code competent, clean, and functional.`;
-
-  /* ===================== DOM ===================== */
-  const $ = id => document.getElementById(id);
-  const modelInput = $('modelInput');
-  const apiKeyInput = $('apiKeyInput');
-  const chatInput = $('chatInput');
-  const sendBtn = $('sendBtn');
-  const statusPill = $('statusPill');
-  const statusText = $('statusText');
-  const feedBody = $('feedBody');
-  const feedEmpty = $('feedEmpty');
-  const feedPanel = $('feedPanel');
-  const fileList = $('fileList');
-  const codeArea = $('codeArea');
-  const editorHead = $('editorHead');
-  const editorFname = $('editorFname');
-  const editorEmpty = $('editorEmpty');
-  const previewFrame = $('previewFrame');
-  const previewEmpty = $('previewEmpty');
-  const previewStage = $('previewStage');
-  const autoUpdateToggle = $('autoUpdateToggle');
-
-  /* ===================== INIT: load saved key ===================== */
-  try{
-    const savedKey = localStorage.getItem('ff_api_key');
-    if(savedKey) apiKeyInput.value = savedKey;
-    const savedModel = localStorage.getItem('ff_model');
-    if(savedModel) modelInput.value = savedModel;
-  }catch(e){}
-
-  $('saveKeyBtn').addEventListener('click', () => {
-    try{
-      localStorage.setItem('ff_api_key', apiKeyInput.value.trim());
-      localStorage.setItem('ff_model', modelInput.value.trim());
-      flashIcon($('saveKeyBtn'));
-    }catch(e){}
-  });
-
-  function flashIcon(btn){
-    btn.classList.add('active');
-    setTimeout(()=>btn.classList.remove('active'), 700);
-  }
-
-  $('toggleKeyVis').addEventListener('click', () => {
-    apiKeyInput.type = apiKeyInput.type === 'password' ? 'text' : 'password';
-  });
-
-  $('toggleFeedBtn').addEventListener('click', () => {
-    feedPanel.classList.toggle('collapsed');
-  });
-
-  $('clearFeedBtn').addEventListener('click', () => {
-    feedBody.innerHTML = '';
-    feedBody.appendChild(feedEmpty);
-    feedEmpty.style.display = 'block';
-  });
-
-  $('clearAllBtn').addEventListener('click', () => {
-    if(!confirm('Wipe the current project and chat history? This cannot be undone.')) return;
-    state.files = {};
-    state.activeFile = null;
-    state.history = [];
-    renderFileList();
-    renderEditor();
-    renderPreview();
-    feedBody.innerHTML = '';
-    feedBody.appendChild(feedEmpty);
-    feedEmpty.style.display = 'block';
-  });
-
-  /* ===================== TABS ===================== */
-  document.querySelectorAll('.tab-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
-      document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
-      btn.classList.add('active');
-      $('tab-'+btn.dataset.tab).classList.add('active');
-      if(btn.dataset.tab === 'preview'){
-        renderPreview();
-      }
-    });
-  });
-
-  /* ===================== FEED LOG ===================== */
-  function logFeed(type, text){
-    feedEmpty.style.display = 'none';
-    const div = document.createElement('div');
-    div.className = 'feed-entry ' + type;
-    const tagNames = {say:'process', write:'wrote', patch:'patched', error:'error', delete:'deleted'};
-    div.innerHTML = '<span class="tag">'+(tagNames[type]||type)+'</span>' + escapeHtml(text);
-    feedBody.appendChild(div);
-    feedBody.scrollTop = feedBody.scrollHeight;
-  }
-
-  function escapeHtml(s){
-    const d = document.createElement('div');
-    d.textContent = s;
-    return d.innerHTML;
-  }
-
-  /* ===================== FILE TREE / EDITOR ===================== */
-  function fileIconSvg(name){
-    if(name.endsWith('.html')) return '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>';
-    if(name.endsWith('.css')) return '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/></svg>';
-    if(name.endsWith('.js')) return '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>';
-    return '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>';
-  }
-
-  function renderFileList(){
-    const paths = Object.keys(state.files).sort((a,b)=>{
-      if(a === state.entryFile) return -1;
-      if(b === state.entryFile) return 1;
-      return a.localeCompare(b);
-    });
-    if(paths.length === 0){
-      fileList.innerHTML = '<div class="file-rail-empty">no files yet — ask for a game in the bar above.</div>';
-      return;
-    }
-    fileList.innerHTML = '';
-    paths.forEach(p => {
-      const item = document.createElement('div');
-      item.className = 'file-item' + (p === state.activeFile ? ' active' : '') + (p === state.entryFile ? ' entry' : '');
-      item.innerHTML = fileIconSvg(p) + '<span class="file-item-name">'+escapeHtml(p)+'</span>';
-      item.addEventListener('click', () => {
-        state.activeFile = p;
-        renderFileList();
-        renderEditor();
-      });
-      fileList.appendChild(item);
-    });
-  }
-
-  function renderEditor(){
-    if(!state.activeFile || !(state.activeFile in state.files)){
-      editorHead.style.display = 'none';
-      codeArea.style.display = 'none';
-      editorEmpty.style.display = 'flex';
-      return;
-    }
-    editorHead.style.display = 'flex';
-    codeArea.style.display = 'block';
-    editorEmpty.style.display = 'none';
-    editorFname.textContent = state.activeFile;
-    codeArea.value = state.files[state.activeFile];
-  }
-
-  codeArea.addEventListener('input', () => {
-    if(state.activeFile){
-      state.files[state.activeFile] = codeArea.value;
-      if(document.getElementById('tab-preview').classList.contains('active') && autoUpdateToggle.checked){
-        renderPreview();
-      }
-    }
-  });
-
-  /* ===================== PREVIEW (blob-based, multi-file) ===================== */
-  let currentPreviewUrls = [];
-
-  function revokeOldUrls(){
-    currentPreviewUrls.forEach(u => { try{ URL.revokeObjectURL(u); }catch(e){} });
-    currentPreviewUrls = [];
-  }
-
-  function mimeFor(path){
-    if(path.endsWith('.css')) return 'text/css';
-    if(path.endsWith('.js')) return 'application/javascript';
-    if(path.endsWith('.json')) return 'application/json';
-    if(path.endsWith('.html')) return 'text/html';
-    if(path.endsWith('.svg')) return 'image/svg+xml';
-    return 'text/plain';
-  }
-
-  function renderPreview(){
-    revokeOldUrls();
-    const entry = state.files[state.entryFile];
-    if(!entry){
-      previewFrame.style.display = 'none';
-      previewEmpty.style.display = 'flex';
-      previewFrame.removeAttribute('src');
-      return;
-    }
-    previewEmpty.style.display = 'none';
-    previewFrame.style.display = 'block';
-
-    // build blob URLs for every non-entry file
-    const urlMap = {};
-    Object.keys(state.files).forEach(path => {
-      if(path === state.entryFile) return;
-      const blob = new Blob([state.files[path]], {type: mimeFor(path)});
-      const url = URL.createObjectURL(blob);
-      currentPreviewUrls.push(url);
-      urlMap[path] = url;
-    });
-
-    // rewrite references in entry html to blob urls
-    let html = entry;
-    Object.keys(urlMap).forEach(path => {
-      const escaped = path.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-      const re = new RegExp('(["\'\(])\\s*(?:\\./)?' + escaped + '(["\'\)])', 'g');
-      html = html.replace(re, '$1' + urlMap[path] + '$2');
-    });
-
-    const htmlBlob = new Blob([html], {type:'text/html'});
-    const htmlUrl = URL.createObjectURL(htmlBlob);
-    currentPreviewUrls.push(htmlUrl);
-    previewFrame.src = htmlUrl;
-  }
-
-  $('runBtn').addEventListener('click', renderPreview);
-
-  $('fullscreenBtn').addEventListener('click', () => {
-    if(previewStage.requestFullscreen){
-      previewStage.requestFullscreen();
-    } else {
-      previewStage.classList.toggle('fullscreen');
-    }
-  });
-
-  document.addEventListener('fullscreenchange', () => {
-    if(!document.fullscreenElement){
-      previewStage.classList.remove('fullscreen');
-    }
-  });
-
-  /* ===================== ZIP (store-only, no compression) ===================== */
-  function crc32(buf){
-    let table = crc32.table;
-    if(!table){
-      table = crc32.table = new Uint32Array(256);
-      for(let n=0;n<256;n++){
-        let c = n;
-        for(let k=0;k<8;k++){
-          c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
+        function resizeCanvas() {
+            const temp = document.createElement('canvas');
+            temp.width = canvas.width; temp.height = canvas.height;
+            temp.getContext('2d').drawImage(canvas, 0, 0);
+            const dpr = window.devicePixelRatio || 1;
+            canvas.width = window.innerWidth * dpr; canvas.height = window.innerHeight * dpr;
+            ctx.scale(dpr, dpr);
+            ctx.drawImage(temp, 0, 0, temp.width/dpr, temp.height/dpr);
+            ctx.lineCap = 'round'; ctx.lineJoin = 'round';
         }
-        table[n] = c;
-      }
-    }
-    let crc = 0xFFFFFFFF;
-    for(let i=0;i<buf.length;i++){
-      crc = table[(crc ^ buf[i]) & 0xFF] ^ (crc >>> 8);
-    }
-    return (crc ^ 0xFFFFFFFF) >>> 0;
-  }
 
-  function strToUint8(str){
-    return new TextEncoder().encode(str);
-  }
-
-  function writeUint32(arr, offset, val){
-    arr[offset] = val & 0xFF;
-    arr[offset+1] = (val >>> 8) & 0xFF;
-    arr[offset+2] = (val >>> 16) & 0xFF;
-    arr[offset+3] = (val >>> 24) & 0xFF;
-  }
-  function writeUint16(arr, offset, val){
-    arr[offset] = val & 0xFF;
-    arr[offset+1] = (val >>> 8) & 0xFF;
-  }
-
-  function buildZip(files){
-    // files: {path: stringContent}
-    const localParts = [];
-    const centralParts = [];
-    let offset = 0;
-    const dosTime = 0, dosDate = 0x21; // arbitrary fixed date
-
-    Object.keys(files).forEach(path => {
-      const nameBytes = strToUint8(path);
-      const dataBytes = strToUint8(files[path]);
-      const crc = crc32(dataBytes);
-
-      const localHeader = new Uint8Array(30 + nameBytes.length);
-      writeUint32(localHeader, 0, 0x04034b50);
-      writeUint16(localHeader, 4, 20);
-      writeUint16(localHeader, 6, 0);
-      writeUint16(localHeader, 8, 0); // no compression
-      writeUint16(localHeader, 10, dosTime);
-      writeUint16(localHeader, 12, dosDate);
-      writeUint32(localHeader, 14, crc);
-      writeUint32(localHeader, 18, dataBytes.length);
-      writeUint32(localHeader, 22, dataBytes.length);
-      writeUint16(localHeader, 26, nameBytes.length);
-      writeUint16(localHeader, 28, 0);
-      localHeader.set(nameBytes, 30);
-
-      localParts.push(localHeader, dataBytes);
-
-      const centralHeader = new Uint8Array(46 + nameBytes.length);
-      writeUint32(centralHeader, 0, 0x02014b50);
-      writeUint16(centralHeader, 4, 20);
-      writeUint16(centralHeader, 6, 20);
-      writeUint16(centralHeader, 8, 0);
-      writeUint16(centralHeader, 10, 0);
-      writeUint16(centralHeader, 12, dosTime);
-      writeUint16(centralHeader, 14, dosDate);
-      writeUint32(centralHeader, 16, crc);
-      writeUint32(centralHeader, 20, dataBytes.length);
-      writeUint32(centralHeader, 24, dataBytes.length);
-      writeUint16(centralHeader, 28, nameBytes.length);
-      writeUint16(centralHeader, 30, 0);
-      writeUint16(centralHeader, 32, 0);
-      writeUint16(centralHeader, 34, 0);
-      writeUint16(centralHeader, 36, 0);
-      writeUint32(centralHeader, 38, 0);
-      writeUint32(centralHeader, 42, offset);
-      centralHeader.set(nameBytes, 46);
-
-      centralParts.push(centralHeader);
-      offset += localHeader.length + dataBytes.length;
-    });
-
-    const centralSize = centralParts.reduce((s,p)=>s+p.length,0);
-    const centralOffset = offset;
-
-    const end = new Uint8Array(22);
-    writeUint32(end, 0, 0x06054b50);
-    writeUint16(end, 4, 0);
-    writeUint16(end, 6, 0);
-    writeUint16(end, 8, Object.keys(files).length);
-    writeUint16(end, 10, Object.keys(files).length);
-    writeUint32(end, 12, centralSize);
-    writeUint32(end, 16, centralOffset);
-    writeUint16(end, 20, 0);
-
-    const allParts = [...localParts, ...centralParts, end];
-    const totalLen = allParts.reduce((s,p)=>s+p.length,0);
-    const result = new Uint8Array(totalLen);
-    let pos = 0;
-    allParts.forEach(p => { result.set(p, pos); pos += p.length; });
-    return result;
-  }
-
-  $('downloadBtn').addEventListener('click', () => {
-    if(Object.keys(state.files).length === 0){
-      logFeed('error', 'nothing to download. build something first, genius.');
-      return;
-    }
-    const zipBytes = buildZip(state.files);
-    const blob = new Blob([zipBytes], {type:'application/zip'});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'feral-forge-game.zip';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    setTimeout(()=>URL.revokeObjectURL(url), 4000);
-  });
-
-  /* ===================== APPLY AI ACTIONS ===================== */
-  function applyActions(actions){
-    let filesChanged = false;
-    actions.forEach(act => {
-      if(!act || typeof act !== 'object') return;
-      try{
-        if(act.action === 'say'){
-          logFeed('say', act.text || '...');
-        } else if(act.action === 'write_file'){
-          if(typeof act.path !== 'string' || typeof act.content !== 'string') return;
-          state.files[act.path] = act.content;
-          filesChanged = true;
-          logFeed('write', act.path);
-        } else if(act.action === 'patch_file'){
-          if(typeof act.path !== 'string' || typeof act.find !== 'string' || typeof act.replace !== 'string') return;
-          const current = state.files[act.path];
-          if(current === undefined){
-            logFeed('error', 'tried to patch "'+act.path+'" but it does not exist yet.');
-            return;
-          }
-          const idx = current.indexOf(act.find);
-          if(idx === -1){
-            logFeed('error', 'patch target not found in "'+act.path+'" — find string did not match exactly.');
-            return;
-          }
-          const secondIdx = current.indexOf(act.find, idx+1);
-          if(secondIdx !== -1){
-            logFeed('error', 'patch target in "'+act.path+'" is ambiguous (matches multiple spots) — skipped for safety.');
-            return;
-          }
-          state.files[act.path] = current.slice(0,idx) + act.replace + current.slice(idx + act.find.length);
-          filesChanged = true;
-          logFeed('patch', act.path);
-        } else if(act.action === 'delete_file'){
-          if(typeof act.path !== 'string') return;
-          delete state.files[act.path];
-          filesChanged = true;
-          logFeed('delete', act.path);
+        // Procedural Mini-Renderer Engine to generate dropdown previews automatically
+        function generateBrushPreviews() {
+            selectOptions.innerHTML = '';
+            
+            Object.keys(Brushes).forEach(key => {
+                const b = Brushes[key];
+                
+                // Spin up an offscreen micro-canvas
+                const pCanvas = document.createElement('canvas');
+                pCanvas.width = 70; pCanvas.height = 32;
+                const pCtx = pCanvas.getContext('2d');
+                pCtx.lineCap = 'round'; pCtx.lineJoin = 'round';
+                
+                // Draw a standard test curve signature representing the stroke style
+                const p1 = { x: 5, y: 22, t: 0 };
+                const p2 = { x: 35, y: 8, t: 100 };
+                const p3 = { x: 65, y: 16, t: 200 };
+                
+                const dummyStyle = { color: '#000000', size: 6, lastWidth: 6 };
+                paintProceduralStroke(pCtx, p1, p2, b, dummyStyle, null);
+                paintProceduralStroke(pCtx, p2, p3, b, dummyStyle, null);
+                
+                const dataUrl = pCanvas.toDataURL();
+                
+                // Build options list element
+                const item = document.createElement('div');
+                item.className = 'option-item';
+                item.dataset.value = key;
+                item.innerHTML = `<img src="${dataUrl}" alt="swatch"> <span>${b.name}</span>`;
+                
+                item.addEventListener('click', () => {
+                    activeBrushKey = key;
+                    selectTrigger.innerHTML = item.innerHTML;
+                    selectOptions.classList.remove('show');
+                });
+                
+                selectOptions.appendChild(item);
+                
+                // Default fallback initialization
+                if (key === activeBrushKey) {
+                    selectTrigger.innerHTML = item.innerHTML;
+                }
+            });
         }
-      }catch(e){
-        logFeed('error', 'failed to apply an action: ' + e.message);
-      }
-    });
 
-    if(filesChanged){
-      renderFileList();
-      if(state.activeFile && !(state.activeFile in state.files)){
-        state.activeFile = null;
-      }
-      if(!state.activeFile && state.files[state.entryFile]){
-        state.activeFile = state.entryFile;
-        renderFileList();
-      }
-      renderEditor();
-      if(document.getElementById('tab-preview').classList.contains('active') && autoUpdateToggle.checked){
-        renderPreview();
-      } else if(autoUpdateToggle.checked){
-        renderPreview(); // keep it warm even if not visible
-      }
-    }
-  }
+        // Global Event listener closure toggle for drop menus
+        selectTrigger.addEventListener('click', (e) => {
+            e.stopPropagation();
+            selectOptions.classList.toggle('show');
+        });
+        document.addEventListener('click', () => selectOptions.classList.remove('show'));
 
-  /* ===================== PARSE MODEL OUTPUT ===================== */
-  function extractJsonArray(text){
-    let t = text.trim();
-    // strip markdown fences if present
-    t = t.replace(/^```(?:json)?\s*/i, '').replace(/```\s*$/,'').trim();
-    // find first [ and last ] to be tolerant of stray text
-    const start = t.indexOf('[');
-    const end = t.lastIndexOf(']');
-    if(start === -1 || end === -1 || end < start){
-      throw new Error('no JSON array found in model response');
-    }
-    const candidate = t.slice(start, end+1);
-    return JSON.parse(candidate);
-  }
+        function getCoordinates(e) {
+            const rect = canvas.getBoundingClientRect();
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            return { x: clientX - rect.left, y: clientY - rect.top, t: Date.now() };
+        }
 
-  /* ===================== SEND / STREAM ===================== */
-  function setBusy(busy){
-    state.busy = busy;
-    statusPill.classList.toggle('busy', busy);
-    statusPill.classList.toggle('ready', !busy);
-    statusText.textContent = busy ? 'forging' : 'idle';
-    sendBtn.classList.toggle('stop', busy);
-    sendBtn.innerHTML = busy
-      ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12"/></svg>'
-      : '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>';
-  }
+        function startDrawing(e) {
+            isDrawing = true;
+            const pos = getCoordinates(e);
+            points = [pos];
+            colorIndicator.style.background = colorPicker.value;
+        }
 
-  async function sendMessage(){
-    if(state.busy){
-      if(state.abortController) state.abortController.abort();
-      setBusy(false);
-      logFeed('error', 'interrupted mid-thought. rude, but understood.');
-      return;
-    }
-    const msg = chatInput.value.trim();
-    if(!msg) return;
-    const apiKey = apiKeyInput.value.trim();
-    const model = modelInput.value.trim() || 'nex-agi/nex-n2-pro:free';
-    if(!apiKey){
-      logFeed('error', 'no API key set. paste an OpenRouter key in the bar above.');
-      return;
-    }
+        function draw(e) {
+            if (!isDrawing) return;
+            e.preventDefault();
+            
+            const pos = getCoordinates(e);
+            points.push(pos);
 
-    chatInput.value = '';
-    chatInput.style.height = 'auto';
+            if (points.length > 1) {
+                const style = {
+                    color: mode === 'eraser' ? '#ffffff' : colorPicker.value,
+                    size: parseInt(strokeWidth.value),
+                    lastWidth: lastWidth
+                };
+                // Call externalized logic
+                lastWidth = paintProceduralStroke(ctx, points[points.length - 2], points[points.length - 1], Brushes[activeBrushKey], style, canvas);
+            }
+            if (points.length > 10) points.shift();
+        }
 
-    let projectSummary = '';
-    if(Object.keys(state.files).length > 0){
-      projectSummary = 'Current project files (full current content of each, for context — patch against THESE exact contents):\n';
-      Object.keys(state.files).forEach(p => {
-        projectSummary += '\n--- FILE: ' + p + ' ---\n' + state.files[p] + '\n--- END FILE ---\n';
-      });
-    } else {
-      projectSummary = 'There is no existing project yet. This is a fresh build.';
-    }
+        function stopDrawing() { isDrawing = false; points = []; }
 
-    state.history.push({role:'user', content: msg});
+        if (window.PointerEvent) {
+            canvas.addEventListener('pointerdown', startDrawing);
+            canvas.addEventListener('pointermove', draw);
+            canvas.addEventListener('pointerup', stopDrawing);
+        } else {
+            canvas.addEventListener('touchstart', startDrawing);
+            canvas.addEventListener('touchmove', draw, { passive: false });
+            canvas.addEventListener('touchend', stopDrawing);
+        }
 
-    const messages = [
-      {role:'system', content: SYSTEM_PROMPT},
-      {role:'system', content: projectSummary},
-      ...state.history
-    ];
+        penBtn.addEventListener('click', () => { mode = 'pen'; penBtn.classList.add('active'); eraserBtn.classList.remove('active'); });
+        eraserBtn.addEventListener('click', () => { mode = 'eraser'; eraserBtn.classList.add('active'); penBtn.classList.remove('active'); });
+        clearBtn.addEventListener('click', () => { if(confirm("Clear?")) ctx.clearRect(0, 0, canvas.width, canvas.height); });
+        colorPicker.addEventListener('input', () => colorIndicator.style.background = colorPicker.value);
 
-    setBusy(true);
-    logFeed('say', 'incoming request received. processing with great instability...');
-
-    const controller = new AbortController();
-    state.abortController = controller;
-
-    try{
-      const resp = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-        method: 'POST',
-        headers:{
-          'Content-Type':'application/json',
-          'Authorization':'Bearer ' + apiKey,
-          'HTTP-Referer': location.href,
-          'X-Title': 'FERAL FORGE'
-        },
-        body: JSON.stringify({
-          model: model,
-          messages: messages,
-          temperature: 1.0
-        }),
-        signal: controller.signal
-      });
-
-      if(!resp.ok){
-        const errText = await resp.text();
-        throw new Error('API error ' + resp.status + ': ' + errText.slice(0,300));
-      }
-
-      const data = await resp.json();
-      const content = data && data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content;
-      if(!content){
-        throw new Error('empty response from model');
-      }
-
-      state.history.push({role:'assistant', content: content});
-
-      let actions;
-      try{
-        actions = extractJsonArray(content);
-      }catch(parseErr){
-        logFeed('error', 'model response was not valid action JSON: ' + parseErr.message);
-        logFeed('say', 'my thoughts came out wrong. try rephrasing, or just yell at me again.');
-        setBusy(false);
-        state.abortController = null;
-        return;
-      }
-
-      if(!Array.isArray(actions)){
-        logFeed('error', 'model did not return an array of actions.');
-      } else {
-        applyActions(actions);
-      }
-
-    }catch(err){
-      if(err.name === 'AbortError'){
-        // already logged on manual stop
-      } else {
-        logFeed('error', err.message || 'unknown failure occurred.');
-      }
-    } finally{
-      setBusy(false);
-      state.abortController = null;
-    }
-  }
-
-  sendBtn.addEventListener('click', sendMessage);
-  chatInput.addEventListener('keydown', (e) => {
-    if(e.key === 'Enter' && !e.shiftKey){
-      e.preventDefault();
-      sendMessage();
-    }
-  });
-  chatInput.addEventListener('input', () => {
-    chatInput.style.height = 'auto';
-    chatInput.style.height = Math.min(chatInput.scrollHeight, 90) + 'px';
-  });
-
-  /* ===================== INITIAL RENDER ===================== */
-  renderFileList();
-  renderEditor();
-  renderPreview();
-
-})();
+        window.addEventListener('resize', resizeCanvas);
+        window.addEventListener('DOMContentLoaded', () => { 
+            resizeCanvas(); 
+            generateBrushPreviews();
+            colorIndicator.style.background = colorPicker.value;
+        });
   </script>
 </body>
 
