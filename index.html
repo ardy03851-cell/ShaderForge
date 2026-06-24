@@ -3,265 +3,1291 @@
 
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Query — Temu Search Distiller</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>ShaderForge — Minecraft Shader IDE</title>
   <style>
+    /* ─── DESIGN TOKENS ─────────────────────────── */
     :root {
-      --ink: #0b0c10;
-      --ink-2: #121319;
-      --panel: #16181f;
-      --panel-2: #1c1f28;
-      --border: #262a35;
-      --border-soft: #1f222b;
-      --text: #ebecf0;
-      --muted: #7d818f;
-      --muted-2: #565a66;
-      --signal: #ff7a3d;
-      --signal-dim: #c9591f;
-      --cyan: #5fd4d6;
-      --mono: "SF Mono", "JetBrains Mono", ui-monospace, "Cascadia Code", Consolas, monospace;
-      --sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --bg: #0d0f14;
+      --surface: #131720;
+      --panel: #181d28;
+      --border: #252d3d;
+      --border-hi: #3a4560;
+      --accent: #5b8fff;
+      --accent-dim: #2c4a99;
+      --accent-glow: #5b8fff33;
+      --green: #3dd68c;
+      --yellow: #f5c842;
+      --red: #f26464;
+      --purple: #b07dff;
+      --cyan: #4dd9e8;
+      --text: #d8dde8;
+      --text-dim: #7a8499;
+      --text-muted: #4a5268;
+      --radius: 6px;
+      --radius-lg: 10px;
+      --font-ui: 'Inter', system-ui, -apple-system, sans-serif;
+      --font-mono: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+      --transition: 0.15s ease;
+      --sidebar-w: 240px;
+      --output-h: 240px;
     }
 
     * {
       box-sizing: border-box;
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-
-      *,
-      *::before,
-      *::after {
-        animation-duration: 0.01ms !important;
-        transition-duration: 0.01ms !important;
-      }
-    }
-
-    body {
       margin: 0;
-      min-height: 100vh;
-      background:
-        radial-gradient(ellipse 800px 500px at 50% -10%, rgba(255, 122, 61, 0.08), transparent),
-        radial-gradient(ellipse 600px 400px at 90% 100%, rgba(95, 212, 214, 0.05), transparent),
-        var(--ink);
+      padding: 0;
+    }
+
+    html,
+    body {
+      height: 100%;
+      overflow: hidden;
+      background: var(--bg);
       color: var(--text);
-      font-family: var(--sans);
-      display: flex;
-      justify-content: center;
-      padding: 56px 18px 80px;
-      -webkit-font-smoothing: antialiased;
-    }
-
-    .wrap {
-      width: 100%;
-      max-width: 620px;
-    }
-
-    /* ---------- header ---------- */
-    .eyebrow {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-family: var(--mono);
-      font-size: 12px;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--muted-2);
-      margin-bottom: 14px;
-    }
-
-    .eyebrow .dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: var(--signal);
-      box-shadow: 0 0 0 3px rgba(255, 122, 61, 0.15);
-    }
-
-    h1 {
-      font-size: 28px;
-      font-weight: 650;
-      letter-spacing: -0.02em;
-      margin: 0 0 6px;
-      line-height: 1.2;
-    }
-
-    h1 span {
-      color: var(--muted);
-      font-weight: 450;
-    }
-
-    p.sub {
-      color: var(--muted);
-      font-size: 14.5px;
+      font-family: var(--font-ui);
+      font-size: 13px;
       line-height: 1.5;
-      margin: 0 0 28px;
-      max-width: 46ch;
     }
 
-    /* ---------- input ---------- */
-    .input-shell {
-      position: relative;
-      border-radius: 14px;
-      background: var(--panel);
-      border: 1px solid var(--border);
-      transition: border-color 0.2s ease, box-shadow 0.2s ease;
-    }
-
-    .input-shell:focus-within {
-      border-color: var(--signal-dim);
-      box-shadow: 0 0 0 4px rgba(255, 122, 61, 0.08);
-    }
-
-    textarea {
-      width: 100%;
-      min-height: 88px;
-      background: transparent;
+    button {
+      cursor: pointer;
       border: none;
+      background: none;
+      font-family: inherit;
+      font-size: inherit;
+      color: inherit;
+    }
+
+    input,
+    textarea,
+    select {
+      font-family: inherit;
+      font-size: inherit;
       color: var(--text);
-      padding: 16px 16px 50px;
-      font-size: 15.5px;
-      font-family: var(--sans);
-      line-height: 1.5;
-      resize: vertical;
-    }
-
-    textarea::placeholder {
-      color: var(--muted-2);
-    }
-
-    textarea:focus {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
       outline: none;
     }
 
-    .input-bar {
-      position: absolute;
-      left: 12px;
-      right: 12px;
-      bottom: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
+    input:focus,
+    textarea:focus,
+    select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-glow);
     }
 
-    .hint {
-      font-family: var(--mono);
-      font-size: 11.5px;
-      color: var(--muted-2);
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--border-hi);
+      border-radius: 3px;
+    }
+
+    svg {
+      display: block;
+      flex-shrink: 0;
+    }
+
+    /* ─── LAYOUT ────────────────────────────────── */
+    #app {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+
+    #titlebar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0 12px;
+      height: 44px;
+      background: var(--panel);
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+      z-index: 100;
+    }
+
+    #main {
+      display: flex;
+      flex: 1;
+      min-height: 0;
+    }
+
+    #sidebar {
+      width: var(--sidebar-w);
+      background: var(--panel);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      overflow: hidden;
+      transition: width var(--transition);
+    }
+
+    #sidebar.collapsed {
+      width: 44px;
+    }
+
+    #workspace {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    #editor-area {
+      flex: 1;
+      display: flex;
+      min-height: 0;
+      position: relative;
+    }
+
+    #output-panel {
+      height: var(--output-h);
+      background: var(--panel);
+      border-top: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      resize: vertical;
+      overflow: hidden;
+      min-height: 120px;
+      max-height: 60vh;
+    }
+
+    /* ─── TITLEBAR ───────────────────────────────── */
+    #logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 700;
+      font-size: 14px;
+      color: var(--text);
+      letter-spacing: -0.3px;
+      margin-right: 4px;
+    }
+
+    #logo-icon {
+      width: 26px;
+      height: 26px;
+      background: linear-gradient(135deg, var(--accent), var(--purple));
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .tb-sep {
+      width: 1px;
+      height: 20px;
+      background: var(--border);
+      margin: 0 4px;
+    }
+
+    .tb-btn {
       display: flex;
       align-items: center;
       gap: 5px;
+      padding: 5px 10px;
+      border-radius: var(--radius);
+      font-size: 12px;
+      color: var(--text-dim);
+      transition: background var(--transition), color var(--transition);
+      white-space: nowrap;
     }
 
-    kbd {
-      font-family: var(--mono);
-      font-size: 10.5px;
-      background: var(--panel-2);
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      padding: 1px 5px;
-      color: var(--muted);
+    .tb-btn:hover {
+      background: var(--surface);
+      color: var(--text);
     }
 
-    button#go {
-      display: inline-flex;
+    .tb-btn.active {
+      background: var(--accent-dim);
+      color: var(--accent);
+    }
+
+    .tb-btn svg {
+      opacity: 0.75;
+    }
+
+    .tb-btn:hover svg {
+      opacity: 1;
+    }
+
+    #tb-right {
+      margin-left: auto;
+      display: flex;
       align-items: center;
-      gap: 7px;
-      background: var(--signal);
-      color: #1a0e06;
-      border: none;
-      border-radius: 9px;
-      padding: 8px 14px;
-      font-size: 13.5px;
-      font-weight: 650;
-      font-family: var(--sans);
+      gap: 4px;
+    }
+
+    #save-indicator {
+      font-size: 11px;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 0 8px;
+    }
+
+    #save-indicator.saved {
+      color: var(--green);
+    }
+
+    #save-indicator.unsaved {
+      color: var(--yellow);
+    }
+
+    /* ─── SIDEBAR ────────────────────────────────── */
+    #sidebar-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 10px;
+      border-bottom: 1px solid var(--border);
+      height: 38px;
+    }
+
+    #sidebar-header span {
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--text-muted);
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
+    .file-tree {
+      flex: 1;
+      overflow-y: auto;
+      padding: 4px 0;
+    }
+
+    .tree-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 10px;
+      border-radius: 0;
       cursor: pointer;
-      transition: filter 0.15s ease, transform 0.1s ease;
+      color: var(--text-dim);
+      transition: background var(--transition), color var(--transition);
+      position: relative;
+      font-size: 12px;
+      user-select: none;
     }
 
-    button#go:hover:not(:disabled) {
-      filter: brightness(1.08);
+    .tree-item:hover {
+      background: var(--surface);
+      color: var(--text);
     }
 
-    button#go:active:not(:disabled) {
-      transform: scale(0.97);
+    .tree-item.active {
+      background: var(--accent-dim);
+      color: var(--accent);
     }
 
-    button#go:disabled {
-      opacity: 0.45;
-      cursor: default;
+    .tree-item.active::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: var(--accent);
     }
 
-    button#go svg {
-      width: 14px;
-      height: 14px;
-      flex-shrink: 0;
+    .tree-folder {
+      font-weight: 600;
+      color: var(--text-dim);
+      margin-top: 2px;
     }
 
-    /* ---------- distillation strip ---------- */
-    #distill {
-      margin-top: 18px;
+    .tree-folder .folder-name {
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .tree-children {
+      padding-left: 16px;
+    }
+
+    .tree-item .item-name {
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .tree-item .item-actions {
       display: none;
-      flex-wrap: wrap;
-      gap: 8px;
-      align-items: center;
-      min-height: 30px;
+      gap: 2px;
     }
 
-    #distill.active {
+    .tree-item:hover .item-actions {
       display: flex;
     }
 
-    .distill-label {
-      font-family: var(--mono);
-      font-size: 11px;
-      color: var(--muted-2);
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      margin-right: 2px;
+    .item-action-btn {
+      padding: 2px;
+      border-radius: 3px;
+      color: var(--text-muted);
     }
 
-    .chip {
-      font-family: var(--mono);
-      font-size: 12.5px;
-      background: var(--panel-2);
-      border: 1px solid var(--border);
-      color: var(--cyan);
-      padding: 4px 10px;
-      border-radius: 100px;
+    .item-action-btn:hover {
+      color: var(--red);
+      background: #f2646422;
+    }
+
+    .ext-badge {
+      font-size: 9px;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+      flex-shrink: 0;
+    }
+
+    .ext-glsl {
+      background: #5b8fff22;
+      color: var(--accent);
+    }
+
+    .ext-json {
+      background: #3dd68c22;
+      color: var(--green);
+    }
+
+    .ext-txt {
+      background: #7a849922;
+      color: var(--text-muted);
+    }
+
+    .ext-png {
+      background: #f5c84222;
+      color: var(--yellow);
+    }
+
+    .ext-lang {
+      background: #b07dff22;
+      color: var(--purple);
+    }
+
+    #sidebar-footer {
+      border-top: 1px solid var(--border);
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .sidebar-collapsed .sidebar-label {
+      display: none;
+    }
+
+    /* ─── TABS ───────────────────────────────────── */
+    #tabs-bar {
+      display: flex;
+      align-items: center;
+      background: var(--panel);
+      border-bottom: 1px solid var(--border);
+      height: 38px;
+      overflow-x: auto;
+      overflow-y: hidden;
+      flex-shrink: 0;
+    }
+
+    #tabs-bar::-webkit-scrollbar {
+      height: 3px;
+    }
+
+    .tab {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 0 14px;
+      height: 100%;
+      border-right: 1px solid var(--border);
+      cursor: pointer;
+      color: var(--text-dim);
+      font-size: 12px;
+      white-space: nowrap;
+      position: relative;
+      transition: color var(--transition), background var(--transition);
+      flex-shrink: 0;
+    }
+
+    .tab:hover {
+      background: var(--surface);
+      color: var(--text);
+    }
+
+    .tab.active {
+      color: var(--text);
+      background: var(--bg);
+    }
+
+    .tab.active::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: var(--accent);
+    }
+
+    .tab .tab-close {
       opacity: 0;
-      transform: translateY(4px) scale(0.95);
-      animation: chipIn 0.35s ease forwards;
+      color: var(--text-muted);
+      padding: 1px 2px;
+      border-radius: 2px;
+      margin-left: 2px;
     }
 
-    @keyframes chipIn {
-      to {
-        opacity: 1;
-        transform: translateY(0) scale(1);
+    .tab:hover .tab-close,
+    .tab.active .tab-close {
+      opacity: 1;
+    }
+
+    .tab .tab-close:hover {
+      color: var(--red);
+      background: #f2646422;
+    }
+
+    .tab.modified .tab-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--yellow);
+    }
+
+    #tabs-new {
+      padding: 0 12px;
+      color: var(--text-muted);
+      height: 100%;
+      display: flex;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    #tabs-new:hover {
+      color: var(--text);
+    }
+
+    /* ─── EDITOR ─────────────────────────────────── */
+    #editor-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      min-height: 0;
+      position: relative;
+    }
+
+    #editor-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 10px;
+      border-bottom: 1px solid var(--border);
+      background: var(--panel);
+      height: 36px;
+      flex-shrink: 0;
+    }
+
+    .ed-btn {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 8px;
+      border-radius: var(--radius);
+      font-size: 11px;
+      color: var(--text-dim);
+      transition: background var(--transition), color var(--transition);
+    }
+
+    .ed-btn:hover {
+      background: var(--surface);
+      color: var(--text);
+    }
+
+    #editor-wrap {
+      flex: 1;
+      display: flex;
+      min-height: 0;
+      position: relative;
+    }
+
+    #line-numbers {
+      background: var(--panel);
+      border-right: 1px solid var(--border);
+      padding: 12px 10px 12px 8px;
+      text-align: right;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      line-height: 1.6;
+      color: var(--text-muted);
+      user-select: none;
+      overflow: hidden;
+      min-width: 48px;
+    }
+
+    #code-editor {
+      flex: 1;
+      padding: 12px 14px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      line-height: 1.6;
+      border: none;
+      resize: none;
+      background: var(--bg);
+      color: var(--text);
+      tab-size: 2;
+      white-space: pre;
+      overflow-wrap: normal;
+      overflow: auto;
+      outline: none;
+    }
+
+    #editor-status {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 3px 12px;
+      background: var(--accent-dim);
+      font-size: 11px;
+      color: var(--accent);
+      border-top: 1px solid var(--accent-dim);
+      flex-shrink: 0;
+    }
+
+    #editor-status span {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    #editor-empty {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      flex: 1;
+      gap: 16px;
+      color: var(--text-muted);
+    }
+
+    #editor-empty h3 {
+      font-size: 16px;
+      color: var(--text-dim);
+      font-weight: 500;
+    }
+
+    #editor-empty p {
+      font-size: 12px;
+      max-width: 280px;
+      text-align: center;
+      line-height: 1.6;
+    }
+
+    /* ─── OUTPUT PANEL ───────────────────────────── */
+    #output-resize {
+      height: 4px;
+      background: var(--border);
+      cursor: row-resize;
+      transition: background var(--transition);
+      flex-shrink: 0;
+    }
+
+    #output-resize:hover {
+      background: var(--accent);
+    }
+
+    #output-tabs {
+      display: flex;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+      padding: 0 10px;
+      gap: 2px;
+      flex-shrink: 0;
+      height: 34px;
+    }
+
+    .out-tab {
+      padding: 6px 12px;
+      font-size: 11px;
+      color: var(--text-muted);
+      border-radius: var(--radius) var(--radius) 0 0;
+      cursor: pointer;
+    }
+
+    .out-tab:hover {
+      color: var(--text);
+    }
+
+    .out-tab.active {
+      color: var(--text);
+      background: var(--surface);
+    }
+
+    #output-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px 12px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      line-height: 1.6;
+    }
+
+    .log-line {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      padding: 2px 0;
+    }
+
+    .log-line.error .log-msg {
+      color: var(--red);
+    }
+
+    .log-line.warn .log-msg {
+      color: var(--yellow);
+    }
+
+    .log-line.info .log-msg {
+      color: var(--text-dim);
+    }
+
+    .log-line.ok .log-msg {
+      color: var(--green);
+    }
+
+    .log-line.hint .log-msg {
+      color: var(--cyan);
+    }
+
+    .log-time {
+      color: var(--text-muted);
+      min-width: 60px;
+    }
+
+    .log-badge {
+      font-size: 9px;
+      padding: 1px 5px;
+      border-radius: 3px;
+      font-weight: 700;
+      margin-top: 2px;
+      flex-shrink: 0;
+    }
+
+    .log-badge.error {
+      background: #f2646422;
+      color: var(--red);
+    }
+
+    .log-badge.warn {
+      background: #f5c84222;
+      color: var(--yellow);
+    }
+
+    .log-badge.info {
+      background: #7a849922;
+      color: var(--text-muted);
+    }
+
+    .log-badge.ok {
+      background: #3dd68c22;
+      color: var(--green);
+    }
+
+    .log-badge.hint {
+      background: #4dd9e822;
+      color: var(--cyan);
+    }
+
+    /* ─── MODAL OVERLAY ──────────────────────────── */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: #00000099;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s;
+    }
+
+    .modal-overlay.open {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .modal {
+      background: var(--panel);
+      border: 1px solid var(--border-hi);
+      border-radius: var(--radius-lg);
+      width: 600px;
+      max-width: 95vw;
+      max-height: 85vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      transform: scale(0.97);
+      transition: transform 0.2s;
+    }
+
+    .modal-overlay.open .modal {
+      transform: scale(1);
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    .modal-header h2 {
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .modal-close {
+      color: var(--text-muted);
+      padding: 4px;
+      border-radius: var(--radius);
+    }
+
+    .modal-close:hover {
+      background: var(--surface);
+      color: var(--text);
+    }
+
+    .modal-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px 18px;
+    }
+
+    .modal-footer {
+      padding: 12px 18px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+      flex-shrink: 0;
+    }
+
+    .btn {
+      padding: 7px 16px;
+      border-radius: var(--radius);
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background var(--transition), border-color var(--transition);
+      border: 1px solid transparent;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #4a7de8;
+    }
+
+    .btn-secondary {
+      background: var(--surface);
+      border-color: var(--border);
+      color: var(--text-dim);
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--border-hi);
+      color: var(--text);
+    }
+
+    .btn-danger {
+      background: #f2646422;
+      border-color: var(--red);
+      color: var(--red);
+    }
+
+    .btn-danger:hover {
+      background: var(--red);
+      color: white;
+    }
+
+    /* ─── PRESETS MODAL ──────────────────────────── */
+    .preset-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .preset-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 14px;
+      cursor: pointer;
+      transition: border-color var(--transition), transform var(--transition);
+    }
+
+    .preset-card:hover {
+      border-color: var(--accent);
+      transform: translateY(-1px);
+    }
+
+    .preset-card.selected {
+      border-color: var(--accent);
+      background: var(--accent-glow);
+    }
+
+    .preset-card-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: var(--radius);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 10px;
+    }
+
+    .preset-card h4 {
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .preset-card p {
+      font-size: 11px;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    .snippet-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 8px;
+    }
+
+    .snippet-btn {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 10px 12px;
+      cursor: pointer;
+      text-align: left;
+      transition: border-color var(--transition);
+    }
+
+    .snippet-btn:hover {
+      border-color: var(--accent);
+    }
+
+    .snippet-btn h5 {
+      font-size: 11px;
+      font-weight: 600;
+      margin-bottom: 3px;
+      color: var(--text);
+    }
+
+    .snippet-btn p {
+      font-size: 10px;
+      color: var(--text-muted);
+    }
+
+    .modal-section-title {
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+      margin-top: 16px;
+    }
+
+    .modal-section-title:first-child {
+      margin-top: 0;
+    }
+
+    /* ─── SEARCH & REPLACE ───────────────────────── */
+    #search-panel {
+      position: absolute;
+      top: 8px;
+      right: 12px;
+      background: var(--panel);
+      border: 1px solid var(--border-hi);
+      border-radius: var(--radius-lg);
+      padding: 10px 12px;
+      z-index: 50;
+      display: none;
+      flex-direction: column;
+      gap: 8px;
+      width: 340px;
+      box-shadow: 0 8px 32px #00000066;
+    }
+
+    #search-panel.open {
+      display: flex;
+    }
+
+    #search-panel input {
+      padding: 6px 10px;
+      font-size: 12px;
+      width: 100%;
+    }
+
+    .search-row {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .search-row input {
+      flex: 1;
+    }
+
+    .search-actions {
+      display: flex;
+      gap: 4px;
+    }
+
+    .search-btn {
+      padding: 5px 10px;
+      border-radius: var(--radius);
+      font-size: 11px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text-dim);
+    }
+
+    .search-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    #search-count {
+      font-size: 11px;
+      color: var(--text-muted);
+      padding: 0 2px;
+    }
+
+    /* ─── NEW FILE DIALOG ────────────────────────── */
+    .input-field {
+      width: 100%;
+      padding: 8px 10px;
+      border-radius: var(--radius);
+      font-size: 13px;
+    }
+
+    .input-label {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-bottom: 5px;
+      font-weight: 500;
+    }
+
+    .input-group {
+      margin-bottom: 14px;
+    }
+
+    .type-pills {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .type-pill {
+      padding: 5px 12px;
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      font-size: 11px;
+      cursor: pointer;
+      color: var(--text-muted);
+      transition: all var(--transition);
+    }
+
+    .type-pill:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .type-pill.active {
+      background: var(--accent-dim);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    select.input-field {
+      appearance: none;
+      -webkit-appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%237a8499'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+      padding-right: 28px;
+    }
+
+    /* ─── TEXTURE VIEWER ─────────────────────────── */
+    #texture-canvas {
+      image-rendering: pixelated;
+      width: 100%;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      background: repeating-conic-gradient(#222 0% 25%, #333 0% 50%) 0 0 / 16px 16px;
+    }
+
+    .texture-info {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 10px;
+      font-size: 11px;
+    }
+
+    .texture-info-item {
+      background: var(--surface);
+      border-radius: var(--radius);
+      padding: 8px 10px;
+    }
+
+    .texture-info-item .ti-label {
+      color: var(--text-muted);
+      margin-bottom: 2px;
+    }
+
+    .texture-info-item .ti-val {
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    /* ─── SETTINGS PANEL ─────────────────────────── */
+    .setting-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .setting-row:last-child {
+      border-bottom: none;
+    }
+
+    .setting-row label {
+      font-size: 12px;
+      color: var(--text-dim);
+    }
+
+    .setting-row .setting-desc {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .toggle {
+      width: 32px;
+      height: 18px;
+      border-radius: 9px;
+      background: var(--border-hi);
+      position: relative;
+      cursor: pointer;
+      transition: background var(--transition);
+    }
+
+    .toggle.on {
+      background: var(--accent);
+    }
+
+    .toggle::after {
+      content: '';
+      position: absolute;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: white;
+      top: 2px;
+      left: 2px;
+      transition: transform var(--transition);
+    }
+
+    .toggle.on::after {
+      transform: translateX(14px);
+    }
+
+    /* ─── CONTEXT MENU ───────────────────────────── */
+    #ctx-menu {
+      position: fixed;
+      background: var(--panel);
+      border: 1px solid var(--border-hi);
+      border-radius: var(--radius);
+      padding: 4px;
+      min-width: 160px;
+      z-index: 2000;
+      box-shadow: 0 8px 24px #00000055;
+      display: none;
+    }
+
+    #ctx-menu.open {
+      display: block;
+    }
+
+    .ctx-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 12px;
+      color: var(--text-dim);
+    }
+
+    .ctx-item:hover {
+      background: var(--surface);
+      color: var(--text);
+    }
+
+    .ctx-item.danger {
+      color: var(--red);
+    }
+
+    .ctx-item.danger:hover {
+      background: #f2646422;
+    }
+
+    .ctx-sep {
+      height: 1px;
+      background: var(--border);
+      margin: 3px 0;
+    }
+
+    /* ─── DROP ZONE ──────────────────────────────── */
+    #drop-overlay {
+      position: fixed;
+      inset: 0;
+      background: #5b8fff22;
+      border: 3px dashed var(--accent);
+      z-index: 999;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--accent);
+    }
+
+    #drop-overlay.active {
+      display: flex;
+    }
+
+    /* ─── TOOLTIP ────────────────────────────────── */
+    [data-tip] {
+      position: relative;
+    }
+
+    [data-tip]:hover::after {
+      content: attr(data-tip);
+      position: absolute;
+      bottom: calc(100% + 6px);
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--panel);
+      border: 1px solid var(--border-hi);
+      border-radius: 4px;
+      padding: 4px 8px;
+      font-size: 11px;
+      white-space: nowrap;
+      color: var(--text);
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    /* ─── RESPONSIVE / MOBILE ────────────────────── */
+    @media (max-width: 768px) {
+      :root {
+        --sidebar-w: 200px;
+        --output-h: 160px;
+      }
+
+      #sidebar {
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        z-index: 200;
+        box-shadow: 4px 0 24px #00000066;
+      }
+
+      #sidebar:not(.mobile-open) {
+        width: 0;
+        border: none;
+      }
+
+      .preset-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .snippet-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      #search-panel {
+        width: calc(100vw - 24px);
+        right: 12px;
       }
     }
 
-    /* ---------- status ---------- */
-    #status {
-      margin-top: 16px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-family: var(--mono);
-      font-size: 12.5px;
-      color: var(--muted);
-      min-height: 18px;
+    @media (max-width: 480px) {
+      :root {
+        --output-h: 130px;
+      }
+
+      .snippet-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .modal {
+        max-height: 92vh;
+      }
     }
 
-    #status.error {
-      color: #ff6b6b;
-    }
-
-    #status .spin {
-      width: 12px;
-      height: 12px;
+    /* ─── SPLITTER ───────────────────────────────── */
+    #vert-splitter {
+      width: 4px;
+      background: var(--border);
+      cursor: col-resize;
       flex-shrink: 0;
-      animation: spin 0.8s linear infinite;
+      transition: background var(--transition);
+    }
+
+    #vert-splitter:hover {
+      background: var(--accent);
+    }
+
+    /* ─── LOADING ────────────────────────────────── */
+    .spin {
+      animation: spin 1s linear infinite;
     }
 
     @keyframes spin {
@@ -270,340 +1296,1544 @@
       }
     }
 
-    /* ---------- results ---------- */
-    #results {
-      margin-top: 22px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
+    .pulse {
+      animation: pulse 2s ease infinite;
     }
 
-    .card {
-      position: relative;
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 16px 16px 16px 18px;
-      text-decoration: none;
-      color: var(--text);
-      display: block;
-      opacity: 0;
-      transform: translateY(8px);
-      animation: cardIn 0.4s ease forwards;
-      transition: border-color 0.15s ease, background 0.15s ease;
-      overflow: hidden;
-    }
+    @keyframes pulse {
 
-    .card::before {
-      content: "";
-      position: absolute;
-      left: 0;
-      top: 0;
-      bottom: 0;
-      width: 3px;
-      background: var(--signal);
-      opacity: 0;
-      transition: opacity 0.15s ease;
-    }
-
-    .card:hover {
-      border-color: var(--signal-dim);
-      background: var(--panel-2);
-    }
-
-    .card:hover::before {
-      opacity: 1;
-    }
-
-    @keyframes cardIn {
-      to {
-        opacity: 1;
-        transform: translateY(0);
+      0%,
+      100% {
+        opacity: 1
       }
-    }
 
-    .card-top {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 12px;
-    }
-
-    .card .query {
-      font-family: var(--mono);
-      font-size: 15px;
-      font-weight: 600;
-      letter-spacing: -0.01em;
-    }
-
-    .card .why {
-      margin-top: 7px;
-      font-size: 13px;
-      color: var(--muted);
-      line-height: 1.45;
-    }
-
-    .card .open {
-      margin-top: 12px;
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      font-size: 12px;
-      color: var(--signal);
-      font-weight: 600;
-      font-family: var(--mono);
-    }
-
-    .card .open svg {
-      width: 12px;
-      height: 12px;
-      transition: transform 0.15s ease;
-    }
-
-    .card:hover .open svg {
-      transform: translate(2px, -2px);
-    }
-
-    .icon-arrow {
-      width: 16px;
-      height: 16px;
-      color: var(--muted-2);
-      flex-shrink: 0;
-      margin-top: 2px;
-    }
-
-    /* ---------- empty state ---------- */
-    #empty {
-      margin-top: 40px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      color: var(--muted-2);
-      gap: 10px;
-    }
-
-    #empty svg {
-      width: 28px;
-      height: 28px;
-      opacity: 0.5;
-    }
-
-    #empty p {
-      font-size: 13px;
-      margin: 0;
-      max-width: 32ch;
-      line-height: 1.5;
+      50% {
+        opacity: 0.5
+      }
     }
   </style>
 </head>
 
 <body>
-  <div class="wrap">
 
-    <div class="eyebrow"><span class="dot"></span>private tool · query distiller</div>
-    <h1>Find it on Temu<span>, faster.</span></h1>
-    <p class="sub">Describe what you're after in your own words. The model distills it into sharp, specific search
-      strings and links straight into Temu's results.</p>
+  <!-- ─── DROP ZONE ─── -->
+  <div id="drop-overlay">
+    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+      style="margin-right:12px">
+      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+      <polyline points="17 8 12 3 7 8" />
+      <line x1="12" y1="3" x2="12" y2="15" />
+    </svg>
+    Drop files to import
+  </div>
 
-    <div class="input-shell">
-      <textarea id="prompt" placeholder="e.g. a small quiet desk fan for a dorm room, not flimsy"></textarea>
-      <div class="input-bar">
-        <span class="hint"><kbd>⌘</kbd><kbd>↵</kbd> to run</span>
-        <button id="go">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
-        Distill
+  <!-- ─── CONTEXT MENU ─── -->
+  <div id="ctx-menu">
+    <div class="ctx-item" onclick="ctxAction('rename')">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M12 20h9" />
+        <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
+      </svg>
+      Rename
+    </div>
+    <div class="ctx-item" onclick="ctxAction('duplicate')">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="9" y="9" width="13" height="13" rx="2" />
+        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+      </svg>
+      Duplicate
+    </div>
+    <div class="ctx-item" onclick="ctxAction('format')">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="21" y1="10" x2="7" y2="10" />
+        <line x1="21" y1="6" x2="3" y2="6" />
+        <line x1="21" y1="14" x2="3" y2="14" />
+        <line x1="21" y1="18" x2="7" y2="18" />
+      </svg>
+      Format File
+    </div>
+    <div class="ctx-sep"></div>
+    <div class="ctx-item danger" onclick="ctxAction('delete')">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="3 6 5 6 21 6" />
+        <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+        <path d="M10 11v6" />
+        <path d="M14 11v6" />
+        <path d="M9 6V4h6v2" />
+      </svg>
+      Delete
+    </div>
+  </div>
+
+  <!-- ─── APP ─── -->
+  <div id="app">
+
+    <!-- TITLEBAR -->
+    <div id="titlebar">
+      <div id="logo">
+        <div id="logo-icon">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+          </svg>
+        </div>
+        ShaderForge
+      </div>
+      <div class="tb-sep"></div>
+      <button class="tb-btn" onclick="openModal('presets')" data-tip="Presets & Snippets">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      <span>Presets</span>
+    </button>
+      <button class="tb-btn" onclick="openModal('newfile')" data-tip="New File">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+      <span>New File</span>
+    </button>
+      <button class="tb-btn" onclick="toggleSearch()" data-tip="Search & Replace (Ctrl+H)">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <span>Search</span>
+    </button>
+      <button class="tb-btn" onclick="autoDocument()" data-tip="Auto-Document current file">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg>
+      <span>Auto Doc</span>
+    </button>
+      <button class="tb-btn" onclick="formatCode()" data-tip="Format Code (Ctrl+Shift+F)">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="21" y1="10" x2="7" y2="10"/><line x1="21" y1="6" x2="3" y2="6"/><line x1="21" y1="14" x2="3" y2="14"/><line x1="21" y1="18" x2="7" y2="18"/></svg>
+      <span>Format</span>
+    </button>
+      <button class="tb-btn" onclick="analyzeShader()" data-tip="Analyze shader for issues">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      <span>Analyze</span>
+    </button>
+
+      <div id="tb-right">
+        <div id="save-indicator" class="saved">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <polyline points="20 6 9 17 4 12" />
+          </svg>
+          Saved
+        </div>
+        <div class="tb-sep"></div>
+        <button class="tb-btn" onclick="exportZip()" data-tip="Export as ZIP">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        <span>Export ZIP</span>
+      </button>
+        <button class="tb-btn" onclick="openModal('settings')" data-tip="Settings">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
       </button>
       </div>
     </div>
 
-    <div id="distill"><span class="distill-label">extracting</span></div>
-    <div id="status"></div>
-    <div id="results"></div>
+    <!-- MAIN -->
+    <div id="main">
 
-    <div id="empty">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"
-        stroke-linejoin="round">
-        <circle cx="11" cy="11" r="7" />
-        <path d="M21 21l-4.3-4.3" />
-      </svg>
-      <p>Nothing distilled yet. Describe an item above and run it.</p>
+      <!-- SIDEBAR -->
+      <div id="sidebar">
+        <div id="sidebar-header">
+          <span id="sidebar-title">Project Files</span>
+          <button class="item-action-btn" onclick="toggleSidebar()" data-tip="Toggle sidebar" style="padding:3px">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/></svg>
+        </button>
+        </div>
+        <div class="file-tree" id="file-tree"></div>
+        <div id="sidebar-footer">
+          <button class="tb-btn" style="width:100%;justify-content:center" onclick="openModal('newfile')">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          New File
+        </button>
+          <button class="tb-btn" style="width:100%;justify-content:center" onclick="importFile()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          Import File
+        </button>
+        </div>
+      </div>
+
+      <!-- VERTICAL SPLITTER -->
+      <div id="vert-splitter" onmousedown="startVertSplit(event)"></div>
+
+      <!-- WORKSPACE -->
+      <div id="workspace">
+        <!-- TABS -->
+        <div id="tabs-bar">
+          <button id="tabs-new" onclick="openModal('newfile')" data-tip="New File">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </button>
+        </div>
+
+        <!-- EDITOR AREA -->
+        <div id="editor-area">
+          <div id="editor-container">
+            <!-- EDITOR TOOLBAR -->
+            <div id="editor-toolbar">
+              <button class="ed-btn" onclick="formatCode()" data-tip="Format (Ctrl+Shift+F)">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="21" y1="10" x2="7" y2="10"/><line x1="21" y1="6" x2="3" y2="6"/><line x1="21" y1="14" x2="3" y2="14"/><line x1="21" y1="18" x2="7" y2="18"/></svg>
+              Format
+            </button>
+              <button class="ed-btn" onclick="autoDocument()">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg>
+              Auto Doc
+            </button>
+              <button class="ed-btn" onclick="toggleSearch()">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              Search
+            </button>
+              <button class="ed-btn" onclick="analyzeShader()">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/></svg>
+              Analyze
+            </button>
+              <div style="margin-left:auto;display:flex;gap:4px;align-items:center">
+                <button class="ed-btn" onclick="exportCurrentFile()" data-tip="Export this file">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                Export
+              </button>
+              </div>
+            </div>
+
+            <!-- SEARCH PANEL -->
+            <div id="search-panel">
+              <div class="search-row">
+                <input id="search-find" type="text" placeholder="Find…" oninput="searchHighlight()">
+                <span id="search-count"></span>
+                <button class="modal-close" onclick="toggleSearch()">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
+              </div>
+              <div class="search-row">
+                <input id="search-replace" type="text" placeholder="Replace with…">
+              </div>
+              <div class="search-actions">
+                <button class="search-btn" onclick="doReplace(false)">Replace</button>
+                <button class="search-btn" onclick="doReplace(true)">Replace All</button>
+                <button class="search-btn" onclick="findNext(-1)">Prev</button>
+                <button class="search-btn" onclick="findNext(1)">Next</button>
+              </div>
+            </div>
+
+            <!-- EDITOR WRAP -->
+            <div id="editor-wrap">
+              <div id="line-numbers"></div>
+              <textarea id="code-editor" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off"
+              oninput="onEditorInput()" onkeydown="onEditorKey(event)" onscroll="syncScroll()" onclick="updateCursor()" onkeyup="updateCursor()">
+            </textarea>
+            </div>
+
+            <!-- EMPTY STATE -->
+            <div id="editor-empty" style="display:none">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--border-hi)" stroke-width="1.5">
+                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+              </svg>
+              <h3>No file open</h3>
+              <p>Open a file from the sidebar or create a new one to start editing your shader.</p>
+              <button class="btn btn-primary" onclick="openModal('presets')" style="margin-top:4px">Load Preset Pack</button>
+            </div>
+
+            <!-- STATUS BAR -->
+            <div id="editor-status">
+              <span id="status-cursor">Ln 1, Col 1</span>
+              <span id="status-lang">GLSL</span>
+              <span id="status-size">0 bytes</span>
+              <span id="status-lines">0 lines</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- OUTPUT PANEL RESIZE -->
+        <div id="output-resize" onmousedown="startOutputResize(event)"></div>
+
+        <!-- OUTPUT PANEL -->
+        <div id="output-panel">
+          <div id="output-tabs">
+            <div class="out-tab active" onclick="switchOutTab('console',this)">Console</div>
+            <div class="out-tab" onclick="switchOutTab('warnings',this)">Warnings</div>
+            <div class="out-tab" onclick="switchOutTab('errors',this)">Errors</div>
+            <div class="out-tab" onclick="switchOutTab('hints',this)">Hints</div>
+            <div style="margin-left:auto;display:flex;gap:4px;align-items:center;padding-right:4px">
+              <button class="ed-btn" onclick="clearOutput()" style="font-size:10px">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+              Clear
+            </button>
+              <button class="ed-btn" onclick="analyzeShader()" style="font-size:10px">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>
+              Re-analyze
+            </button>
+            </div>
+          </div>
+          <div id="output-content"></div>
+        </div>
+
+      </div>
     </div>
-
   </div>
 
-  <script>
-    const OPENROUTER_API_KEY = "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";
-const MODEL = "nvidia/nemotron-3-nano-30b-a3b:free";
+  <!-- ─── MODALS ─── -->
 
-const promptEl = document.getElementById('prompt');
-const goBtn = document.getElementById('go');
-const statusEl = document.getElementById('status');
-const resultsEl = document.getElementById('results');
-const distillEl = document.getElementById('distill');
-const emptyEl = document.getElementById('empty');
-
-const ICON_SPIN = `<svg class="spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2a10 10 0 0 1 10 10"/></svg>`;
-const ICON_ARROW = `<svg class="icon-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>`;
-const ICON_OPEN = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>`;
-const ICON_WARN = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;flex-shrink:0"><path d="M12 9v4M12 17h.01M10.3 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.7 3.86a2 2 0 0 0-3.4 0z"/></svg>`;
-
-function temuUrl(query) {
-  return "https://www.temu.com/search_result.html?search_key=" + encodeURIComponent(query);
-}
-
-function setStatus(html, isError) {
-  statusEl.innerHTML = html;
-  statusEl.className = isError ? "error" : "";
-}
-
-function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
-
-// Pulls a few standout keywords from the raw prompt to animate as "extracted"
-// tokens while the real request is in flight — purely a perceived-speed cue.
-function quickKeywords(text) {
-  const stop = new Set(["a","an","the","for","and","with","that","this","but","not","very","really","kind","sort","of","to","in","on","is","are","want","need","looking","find","me","my","please","some","like","just"]);
-  return text
-    .replace(/[^\w\s-]/g, " ")
-    .split(/\s+/)
-    .filter(w => w.length > 2 && !stop.has(w.toLowerCase()))
-    .slice(0, 5);
-}
-
-async function animateDistill(text) {
-  distillEl.innerHTML = '<span class="distill-label">extracting</span>';
-  distillEl.classList.add('active');
-  const words = quickKeywords(text);
-  for (const w of words) {
-    const chip = document.createElement('span');
-    chip.className = 'chip';
-    chip.textContent = w.toLowerCase();
-    distillEl.appendChild(chip);
-    await sleep(90);
-  }
-}
-
-function renderResults(items) {
-  emptyEl.style.display = 'none';
-  resultsEl.innerHTML = "";
-  items.forEach((item, i) => {
-    const a = document.createElement('a');
-    a.className = "card";
-    a.style.animationDelay = (i * 70) + "ms";
-    a.href = temuUrl(item.query);
-    a.target = "_blank";
-    a.rel = "noopener noreferrer";
-    a.innerHTML = `
-      <div class="card-top">
-        <div>
-          <div class="query">${item.query}</div>
-          <div class="why">${item.why || ""}</div>
-        </div>
-        ${ICON_ARROW}
+  <!-- NEW FILE MODAL -->
+  <div class="modal-overlay" id="modal-newfile">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>New File</h2>
+        <button class="modal-close" onclick="closeModal('newfile')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
       </div>
-      <div class="open">${ICON_OPEN} Open on Temu</div>
-    `;
-    resultsEl.appendChild(a);
-  });
-}
+      <div class="modal-body">
+        <div class="input-group">
+          <div class="input-label">Folder</div>
+          <select class="input-field" id="new-folder"></select>
+        </div>
+        <div class="input-group">
+          <div class="input-label">File type</div>
+          <div class="type-pills" id="new-type-pills">
+            <div class="type-pill active" onclick="selectType('glsl',this)">GLSL</div>
+            <div class="type-pill" onclick="selectType('json',this)">JSON</div>
+            <div class="type-pill" onclick="selectType('txt',this)">Text</div>
+            <div class="type-pill" onclick="selectType('lang',this)">Lang</div>
+          </div>
+        </div>
+        <div class="input-group">
+          <div class="input-label">Filename</div>
+          <input type="text" class="input-field" id="new-filename" placeholder="e.g. composite.fsh">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('newfile')">Cancel</button>
+        <button class="btn btn-primary" onclick="createNewFile()">Create File</button>
+      </div>
+    </div>
+  </div>
 
-async function generateQueries(userPrompt) {
-  const systemPrompt = `You are an expert at writing Temu marketplace search queries.
-Given a description of what someone wants to buy, output 3 distinct, highly specific Temu search queries that would surface the best matching products.
-Use concrete product nouns, key attributes (size, material, use-case, style), and avoid vague words.
-Keep each query short (3-7 words), like an actual shopper would type into Temu's search bar.
-Respond ONLY with valid JSON, no markdown, no preamble, in this exact format:
-[{"query":"...","why":"..."},{"query":"...","why":"..."},{"query":"...","why":"..."}]
-"why" is a short 5-12 word reason this query is a strong angle.`;
+  <!-- RENAME MODAL -->
+  <div class="modal-overlay" id="modal-rename">
+    <div class="modal" style="max-width:360px">
+      <div class="modal-header">
+        <h2>Rename File</h2>
+        <button class="modal-close" onclick="closeModal('rename')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+      </div>
+      <div class="modal-body">
+        <div class="input-group">
+          <div class="input-label">New name</div>
+          <input type="text" class="input-field" id="rename-input" placeholder="filename">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('rename')">Cancel</button>
+        <button class="btn btn-primary" onclick="doRename()">Rename</button>
+      </div>
+    </div>
+  </div>
 
-  const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": "Bearer " + OPENROUTER_API_KEY
-    },
-    body: JSON.stringify({
-      model: MODEL,
-      messages: [
-        { role: "system", content: systemPrompt },
-        { role: "user", content: userPrompt }
-      ]
-    })
-  });
+  <!-- TEXTURE MODAL -->
+  <div class="modal-overlay" id="modal-texture">
+    <div class="modal" style="max-width:420px">
+      <div class="modal-header">
+        <h2 id="texture-modal-title">Texture Viewer</h2>
+        <button class="modal-close" onclick="closeModal('texture')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+      </div>
+      <div class="modal-body">
+        <canvas id="texture-canvas"></canvas>
+        <div class="texture-info" id="texture-info"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('texture')">Close</button>
+        <button class="btn btn-danger" onclick="ctxAction('delete');closeModal('texture')">Remove</button>
+      </div>
+    </div>
+  </div>
 
-  if (response.status === 429) {
-    let retryAfter = 5;
-    try {
-      const errJson = await response.json();
-      retryAfter = errJson?.error?.metadata?.retry_after_seconds || 5;
-    } catch (e) {}
-    const err = new Error("Rate limited upstream. Retrying in " + Math.ceil(retryAfter) + "s…");
-    err.isRateLimit = true;
-    err.retryAfter = retryAfter;
-    throw err;
-  }
+  <!-- SETTINGS MODAL -->
+  <div class="modal-overlay" id="modal-settings">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>Settings</h2>
+        <button class="modal-close" onclick="closeModal('settings')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+      </div>
+      <div class="modal-body">
+        <div class="modal-section-title">Editor</div>
+        <div class="setting-row">
+          <div>
+            <div>Tab size</div>
+            <div class="setting-desc">Spaces per indent level</div>
+          </div>
+          <select id="setting-tabsize" class="input-field" style="width:80px" onchange="applySettings()">
+          <option value="2">2</option><option value="4">4</option>
+        </select>
+        </div>
+        <div class="setting-row">
+          <div>
+            <div>Word wrap</div>
+            <div class="setting-desc">Wrap long lines</div>
+          </div>
+          <div class="toggle" id="toggle-wrap" onclick="toggleSetting('wrap')"></div>
+        </div>
+        <div class="setting-row">
+          <div>
+            <div>Auto-analyze on save</div>
+            <div class="setting-desc">Run analysis after each save</div>
+          </div>
+          <div class="toggle on" id="toggle-analyze" onclick="toggleSetting('analyze')"></div>
+        </div>
+        <div class="setting-row">
+          <div>
+            <div>Auto-format on save</div>
+            <div class="setting-desc">Format code when saving</div>
+          </div>
+          <div class="toggle" id="toggle-fmt" onclick="toggleSetting('fmt')"></div>
+        </div>
+        <div class="modal-section-title">Project</div>
+        <div class="setting-row">
+          <div>
+            <div>Project name</div>
+          </div>
+          <input type="text" id="setting-projname" class="input-field" style="width:160px" value="MyShaderPack" onchange="applySettings()">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('settings')">Close</button>
+      </div>
+    </div>
+  </div>
 
-  if (!response.ok) {
-    const errText = await response.text();
-    throw new Error("API error " + response.status + ": " + errText);
-  }
+  <!-- PRESETS MODAL -->
+  <div class="modal-overlay" id="modal-presets">
+    <div class="modal" style="max-width:680px">
+      <div class="modal-header">
+        <h2>Presets & Snippets</h2>
+        <button class="modal-close" onclick="closeModal('presets')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+      </div>
+      <div class="modal-body">
+        <div class="modal-section-title">Project Structure Presets</div>
+        <div class="preset-grid">
+          <div class="preset-card" onclick="selectPreset('basic',this)">
+            <div class="preset-card-icon" style="background:#5b8fff22">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2">
+                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+              </svg>
+            </div>
+            <h4>Basic Shader Pack</h4>
+            <p>Standard shaders/ folder with gbuffers, composite, and final passes.</p>
+          </div>
+          <div class="preset-card" onclick="selectPreset('full',this)">
+            <div class="preset-card-icon" style="background:#3dd68c22">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+              </svg>
+            </div>
+            <h4>Full Production Pack</h4>
+            <p>All passes: gbuffers, deferred, composite, shadow, final + shaders.properties.</p>
+          </div>
+          <div class="preset-card" onclick="selectPreset('minimal',this)">
+            <div class="preset-card-icon" style="background:#f5c84222">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--yellow)" stroke-width="2">
+                <circle cx="12" cy="12" r="10" />
+                <line x1="8" y1="12" x2="16" y2="12" />
+              </svg>
+            </div>
+            <h4>Minimal Pack</h4>
+            <p>Just the essential files to get started — gbuffers_terrain and final only.</p>
+          </div>
+          <div class="preset-card" onclick="selectPreset('custom',this)">
+            <div class="preset-card-icon" style="background:#b07dff22">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--purple)" stroke-width="2">
+                <line x1="12" y1="5" x2="12" y2="19" />
+                <line x1="5" y1="12" x2="19" y2="12" />
+              </svg>
+            </div>
+            <h4>Blank Canvas</h4>
+            <p>Empty project — just the folder structure, no files. Build from scratch.</p>
+          </div>
+        </div>
 
-  const data = await response.json();
-  const raw = data.choices?.[0]?.message?.content || "";
-  const cleaned = raw.replace(/```json|```/g, "").trim();
-  const parsed = JSON.parse(cleaned);
-  if (!Array.isArray(parsed)) throw new Error("Unexpected response shape");
-  return parsed;
-}
+        <div class="modal-section-title">Code Snippets — insert into current file</div>
+        <div class="snippet-grid" id="snippet-grid"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('presets')">Cancel</button>
+        <button class="btn btn-primary" onclick="applyPreset()">Apply Preset</button>
+      </div>
+    </div>
+  </div>
 
-async function handleGo() {
-  const userPrompt = promptEl.value.trim();
-  if (!userPrompt) {
-    setStatus(ICON_WARN + " Type what you're looking for first.", true);
-    return;
-  }
+  <input type="file" id="file-import" style="display:none" accept="*/*" multiple onchange="handleFileImport(event)">
 
-  goBtn.disabled = true;
-  resultsEl.innerHTML = "";
-  setStatus(ICON_SPIN + " Distilling your request…");
+  <script>
+    // ─────────────────────────────────────────────────────
+// STATE
+// ─────────────────────────────────────────────────────
+let project = {
+  name: 'MyShaderPack',
+  files: {},   // { 'path': { content, modified, ext, isImage, imageData } }
+  folders: ['shaders']
+};
+let openTabs = [];      // array of paths
+let activeTab = null;
+let saveTimer = null;
+let selectedPreset = 'basic';
+let ctxTarget = null;
+let settings = { tabsize: 2, wrap: false, analyze: true, fmt: false };
+let allLogs = [];
+let searchMatches = [];
+let searchIdx = 0;
 
-  // Fire the real request and the perceived-speed animation in parallel.
-  const animationPromise = animateDistill(userPrompt);
-  const maxRetries = 2;
-  let attempt = 0;
-
-  while (attempt <= maxRetries) {
-    try {
-      const items = await generateQueries(userPrompt);
-      await animationPromise;
-      renderResults(items);
-      setStatus(`Found ${items.length} search ${items.length === 1 ? 'angle' : 'angles'}.`);
-      break;
-    } catch (err) {
-      if (err.isRateLimit && attempt < maxRetries) {
-        setStatus(ICON_SPIN + " " + err.message);
-        await sleep(Math.ceil(err.retryAfter) * 1000);
-        attempt++;
-        continue;
-      }
-      await animationPromise;
-      setStatus(ICON_WARN + " " + (err.message || "Something went wrong."), true);
-      break;
-    }
-  }
-
-  distillEl.classList.remove('active');
-  goBtn.disabled = false;
-}
-
-goBtn.addEventListener('click', handleGo);
-promptEl.addEventListener('keydown', (e) => {
-  if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
-    handleGo();
+// ─────────────────────────────────────────────────────
+// INIT
+// ─────────────────────────────────────────────────────
+window.addEventListener('load', () => {
+  loadFromStorage();
+  renderTree();
+  renderTabs();
+  renderEditor();
+  updateOutput();
+  setupDragDrop();
+  setupKeyboard();
+  if (Object.keys(project.files).length === 0) {
+    log('info', 'Welcome to ShaderForge. Load a preset or create files to begin.');
+    log('hint', 'Tip: Use Presets to scaffold a full shader pack in one click.');
+    log('hint', 'Tip: Ctrl+H opens Search & Replace. Ctrl+Shift+F formats code.');
   }
 });
+
+// ─────────────────────────────────────────────────────
+// PERSISTENCE
+// ─────────────────────────────────────────────────────
+function saveToStorage() {
+  try {
+    localStorage.setItem('sf_project', JSON.stringify(project));
+    setSaveIndicator('saved');
+  } catch(e) {
+    setSaveIndicator('unsaved');
+  }
+}
+function loadFromStorage() {
+  try {
+    const raw = localStorage.getItem('sf_project');
+    if (raw) project = JSON.parse(raw);
+  } catch(e) {}
+  if (!project.folders) project.folders = ['shaders'];
+  if (!project.files) project.files = {};
+}
+function scheduleSave() {
+  setSaveIndicator('unsaved');
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => {
+    if (activeTab) {
+      project.files[activeTab].content = document.getElementById('code-editor').value;
+    }
+    if (settings.fmt) formatCode(true);
+    saveToStorage();
+    if (settings.analyze) analyzeShader(true);
+  }, 800);
+}
+function setSaveIndicator(state) {
+  const el = document.getElementById('save-indicator');
+  el.className = state;
+  if (state === 'saved') {
+    el.innerHTML = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Saved`;
+  } else {
+    el.innerHTML = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg> Unsaved`;
+  }
+}
+
+// ─────────────────────────────────────────────────────
+// FILE TREE
+// ─────────────────────────────────────────────────────
+function getExt(path) {
+  const m = path.match(/\.(\w+)$/);
+  return m ? m[1].toLowerCase() : '';
+}
+function extBadge(ext) {
+  const cls = { glsl:'glsl', fsh:'glsl', vsh:'glsl', gsh:'glsl', json:'json', txt:'txt', properties:'txt', lang:'lang', png:'png', jpg:'png', tga:'png' };
+  const c = cls[ext] || 'txt';
+  return `<span class="ext-badge ext-${c}">${ext}</span>`;
+}
+function extIcon(ext) {
+  if (['fsh','vsh','gsh','glsl'].includes(ext)) {
+    return `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>`;
+  } else if (['png','jpg','tga'].includes(ext)) {
+    return `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--yellow)" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>`;
+  } else if (ext === 'json') {
+    return `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg>`;
+  } else {
+    return `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg>`;
+  }
+}
+function renderTree() {
+  const tree = document.getElementById('file-tree');
+  const folders = {};
+  project.folders.forEach(f => { folders[f] = []; });
+  Object.keys(project.files).forEach(path => {
+    const parts = path.split('/');
+    if (parts.length > 1) {
+      const folder = parts.slice(0, -1).join('/');
+      if (!folders[folder]) folders[folder] = [];
+      folders[folder].push(path);
+    } else {
+      if (!folders['']) folders[''] = [];
+      folders[''].push(path);
+    }
+  });
+  let html = '';
+  Object.entries(folders).forEach(([folder, files]) => {
+    if (folder) {
+      html += `<div class="tree-item tree-folder" onclick="toggleFolder(this)">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--yellow)" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+        <span class="folder-name">${folder}</span>
+        <svg class="folder-arrow" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="tree-children folder-children">`;
+      files.forEach(path => {
+        html += renderTreeItem(path);
+      });
+      html += `</div>`;
+    }
+  });
+  if (folders['']) {
+    folders[''].forEach(path => { html += renderTreeItem(path); });
+  }
+  tree.innerHTML = html;
+}
+function renderTreeItem(path) {
+  const name = path.split('/').pop();
+  const ext = getExt(name);
+  const isActive = activeTab === path;
+  const isImg = ['png','jpg','tga'].includes(ext);
+  return `<div class="tree-item ${isActive?'active':''}" data-path="${path}"
+    onclick="${isImg ? `openTexture('${path}')` : `openTab('${path}')`}"
+    oncontextmenu="showCtxMenu(event,'${path}')">
+    ${extIcon(ext)}
+    <span class="item-name">${name}</span>
+    ${extBadge(ext)}
+    <div class="item-actions">
+      <button class="item-action-btn" onclick="event.stopPropagation();ctxTarget='${path}';ctxAction('delete')" data-tip="Delete">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+      </button>
+    </div>
+  </div>`;
+}
+function toggleFolder(el) {
+  const children = el.nextElementSibling;
+  const arrow = el.querySelector('.folder-arrow');
+  const isOpen = children.style.display !== 'none';
+  children.style.display = isOpen ? 'none' : '';
+  arrow.style.transform = isOpen ? 'rotate(-90deg)' : '';
+}
+
+// ─────────────────────────────────────────────────────
+// TABS
+// ─────────────────────────────────────────────────────
+function renderTabs() {
+  const bar = document.getElementById('tabs-bar');
+  let html = `<button id="tabs-new" onclick="openModal('newfile')" data-tip="New File">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+  </button>`;
+  openTabs.forEach(path => {
+    const name = path.split('/').pop();
+    const isActive = activeTab === path;
+    const isDirty = project.files[path] && project.files[path].dirty;
+    html += `<div class="tab ${isActive?'active':''} ${isDirty?'modified':''}" onclick="openTab('${path}')" oncontextmenu="showCtxMenu(event,'${path}')">
+      ${isDirty ? '<div class="tab-dot"></div>' : ''}
+      <span>${name}</span>
+      <button class="tab-close" onclick="event.stopPropagation();closeTab('${path}')">
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>`;
+  });
+  bar.innerHTML = html;
+}
+function openTab(path) {
+  if (activeTab && project.files[activeTab]) {
+    project.files[activeTab].content = document.getElementById('code-editor').value;
+  }
+  if (!openTabs.includes(path)) openTabs.push(path);
+  activeTab = path;
+  renderTabs();
+  renderEditor();
+  renderTree();
+  saveToStorage();
+}
+function closeTab(path) {
+  if (activeTab === path) {
+    project.files[path].content = document.getElementById('code-editor').value;
+  }
+  openTabs = openTabs.filter(p => p !== path);
+  if (activeTab === path) {
+    activeTab = openTabs[openTabs.length - 1] || null;
+  }
+  renderTabs();
+  renderEditor();
+  renderTree();
+}
+
+// ─────────────────────────────────────────────────────
+// EDITOR
+// ─────────────────────────────────────────────────────
+function renderEditor() {
+  const ed = document.getElementById('code-editor');
+  const empty = document.getElementById('editor-empty');
+  const wrap = document.getElementById('editor-wrap');
+  const toolbar = document.getElementById('editor-toolbar');
+  if (!activeTab || !project.files[activeTab]) {
+    ed.style.display = 'none';
+    document.getElementById('line-numbers').style.display = 'none';
+    document.getElementById('editor-status').style.display = 'none';
+    empty.style.display = 'flex';
+    toolbar.style.display = 'none';
+    return;
+  }
+  empty.style.display = 'none';
+  toolbar.style.display = 'flex';
+  ed.style.display = 'block';
+  document.getElementById('line-numbers').style.display = 'block';
+  document.getElementById('editor-status').style.display = 'flex';
+  const f = project.files[activeTab];
+  ed.value = f.content || '';
+  ed.style.whiteSpace = settings.wrap ? 'pre-wrap' : 'pre';
+  updateLineNumbers();
+  updateStatus();
+}
+function onEditorInput() {
+  if (activeTab && project.files[activeTab]) {
+    project.files[activeTab].dirty = true;
+  }
+  updateLineNumbers();
+  updateStatus();
+  scheduleSave();
+}
+function updateLineNumbers() {
+  const ed = document.getElementById('code-editor');
+  const ln = document.getElementById('line-numbers');
+  const lines = ed.value.split('\n').length;
+  let html = '';
+  for (let i = 1; i <= lines; i++) html += i + '\n';
+  ln.textContent = html;
+  ln.scrollTop = ed.scrollTop;
+}
+function syncScroll() {
+  const ed = document.getElementById('code-editor');
+  document.getElementById('line-numbers').scrollTop = ed.scrollTop;
+}
+function updateStatus() {
+  const ed = document.getElementById('code-editor');
+  const val = ed.value;
+  const pos = ed.selectionStart;
+  const lines = val.substring(0, pos).split('\n');
+  const line = lines.length;
+  const col = lines[lines.length - 1].length + 1;
+  document.getElementById('status-cursor').textContent = `Ln ${line}, Col ${col}`;
+  document.getElementById('status-lines').textContent = `${val.split('\n').length} lines`;
+  document.getElementById('status-size').textContent = formatBytes(new Blob([val]).size);
+  const ext = activeTab ? getExt(activeTab) : '';
+  const langMap = { fsh: 'Fragment Shader', vsh: 'Vertex Shader', gsh: 'Geometry Shader', glsl: 'GLSL', json: 'JSON', txt: 'Text', properties: 'Properties', lang: 'Lang' };
+  document.getElementById('status-lang').textContent = langMap[ext] || ext.toUpperCase() || 'Plain Text';
+}
+function updateCursor() { updateStatus(); }
+function formatBytes(b) {
+  if (b < 1024) return b + ' B';
+  if (b < 1048576) return (b/1024).toFixed(1) + ' KB';
+  return (b/1048576).toFixed(1) + ' MB';
+}
+function onEditorKey(e) {
+  if (e.key === 'Tab') {
+    e.preventDefault();
+    const ed = e.target;
+    const start = ed.selectionStart, end = ed.selectionEnd;
+    const spaces = ' '.repeat(settings.tabsize);
+    ed.value = ed.value.substring(0, start) + spaces + ed.value.substring(end);
+    ed.selectionStart = ed.selectionEnd = start + settings.tabsize;
+    onEditorInput();
+  }
+  if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'F') {
+    e.preventDefault(); formatCode();
+  }
+  if ((e.ctrlKey || e.metaKey) && e.key === 'h') {
+    e.preventDefault(); toggleSearch();
+  }
+  if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+    e.preventDefault();
+    if (activeTab) project.files[activeTab].content = document.getElementById('code-editor').value;
+    saveToStorage();
+    analyzeShader(true);
+  }
+  if (e.key === '{' || e.key === '(' || e.key === '[') {
+    const pairs = {'{':'}', '(':')','[':']'};
+    const ed = e.target;
+    const start = ed.selectionStart, end = ed.selectionEnd;
+    if (start === end) {
+      e.preventDefault();
+      const open = e.key, close = pairs[e.key];
+      ed.value = ed.value.substring(0, start) + open + close + ed.value.substring(end);
+      ed.selectionStart = ed.selectionEnd = start + 1;
+      onEditorInput();
+    }
+  }
+}
+function setupKeyboard() {
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+      document.querySelectorAll('.modal-overlay.open').forEach(m => m.classList.remove('open'));
+      document.getElementById('ctx-menu').classList.remove('open');
+      document.getElementById('search-panel').classList.remove('open');
+    }
+  });
+}
+
+// ─────────────────────────────────────────────────────
+// FORMAT CODE
+// ─────────────────────────────────────────────────────
+function formatCode(silent) {
+  if (!activeTab) return;
+  const ed = document.getElementById('code-editor');
+  let code = ed.value;
+  const ext = getExt(activeTab);
+  if (['fsh','vsh','gsh','glsl'].includes(ext)) {
+    code = formatGLSL(code);
+  } else if (ext === 'json') {
+    try { code = JSON.stringify(JSON.parse(code), null, settings.tabsize); } catch(e) { log('error', 'JSON format failed: ' + e.message); return; }
+  }
+  ed.value = code;
+  if (activeTab) project.files[activeTab].content = code;
+  updateLineNumbers();
+  updateStatus();
+  if (!silent) log('ok', `Formatted ${activeTab.split('/').pop()}`);
+}
+function formatGLSL(code) {
+  const lines = code.split('\n');
+  let indent = 0;
+  const tab = ' '.repeat(settings.tabsize);
+  return lines.map(line => {
+    let l = line.trim();
+    if (!l) return '';
+    const closes = (l.match(/}/g) || []).length;
+    const opens = (l.match(/{/g) || []).length;
+    if (l.startsWith('}')) indent = Math.max(0, indent - 1);
+    const out = tab.repeat(indent) + l;
+    indent = Math.max(0, indent + opens - closes);
+    if (l.startsWith('}') && opens > closes) indent++;
+    return out;
+  }).join('\n');
+}
+
+// ─────────────────────────────────────────────────────
+// AUTO DOCUMENT
+// ─────────────────────────────────────────────────────
+function autoDocument() {
+  if (!activeTab) { log('warn', 'No file open to document.'); return; }
+  const ed = document.getElementById('code-editor');
+  let code = ed.value;
+  const ext = getExt(activeTab);
+  if (!['fsh','vsh','gsh','glsl'].includes(ext)) {
+    log('warn', 'Auto Doc works on GLSL files only.'); return;
+  }
+  const header = `// ============================================================\n// File: ${activeTab.split('/').pop()}\n// ShaderForge Auto-Doc\n// Generated: ${new Date().toLocaleDateString()}\n// ============================================================\n\n`;
+  const uniformDocs = [];
+  code.split('\n').forEach(line => {
+    const m = line.match(/^\s*uniform\s+([\w]+)\s+([\w]+)\s*;/);
+    if (m) uniformDocs.push(`// @uniform ${m[2]} (${m[1]}) — [description]`);
+  });
+  let result = header;
+  if (uniformDocs.length) {
+    result += `// --- Uniforms ---\n${uniformDocs.join('\n')}\n\n`;
+  }
+  result += code;
+  ed.value = result;
+  if (activeTab) project.files[activeTab].content = result;
+  updateLineNumbers(); updateStatus();
+  log('ok', `Auto-documented ${activeTab.split('/').pop()} — added file header and uniform annotations.`);
+  scheduleSave();
+}
+
+// ─────────────────────────────────────────────────────
+// ANALYZE SHADER
+// ─────────────────────────────────────────────────────
+function analyzeShader(silent) {
+  if (!silent) clearOutput();
+  const files = Object.entries(project.files);
+  if (!files.length) { log('info', 'No files to analyze.'); return; }
+  let issues = 0;
+  files.forEach(([path, f]) => {
+    if (f.isImage) return;
+    const ext = getExt(path);
+    const code = f.content || '';
+    const name = path.split('/').pop();
+    if (['fsh','vsh','gsh','glsl'].includes(ext)) {
+      analyzeGLSL(path, name, code);
+    } else if (ext === 'json') {
+      try { JSON.parse(code); } catch(e) { log('error', `${name}: Invalid JSON — ${e.message}`); issues++; }
+    }
+  });
+  if (!silent) log('ok', `Analysis complete. ${issues} issue(s) found across ${files.length} file(s).`);
+}
+function analyzeGLSL(path, name, code) {
+  const lines = code.split('\n');
+  let hasVersion = false;
+  const declaredUniforms = new Set(), usedUniforms = new Set();
+  const declaredFuncs = new Set(), calledFuncs = new Set();
+  lines.forEach((line, i) => {
+    const ln = i + 1;
+    const t = line.trim();
+    if (t.startsWith('#version')) hasVersion = true;
+    const um = t.match(/^\s*uniform\s+\w+\s+(\w+)\s*;/);
+    if (um) declaredUniforms.add(um[1]);
+    const fm = t.match(/^\s*\w[\w\s]*\s+(\w+)\s*\(/);
+    if (fm && !['if','for','while','switch'].includes(fm[1])) declaredFuncs.add(fm[1]);
+    if (t.includes('gl_FragColor') && path.includes('vsh')) log('error', `${name}:${ln} — gl_FragColor is not valid in vertex shaders.`);
+    if (t.includes('texture2D(') && !hasVersion) log('warn', `${name}:${ln} — texture2D() may be deprecated. Use texture() with #version 120+`);
+    if (t.match(/\/\*/) && !t.match(/\*\//)) log('warn', `${name}:${ln} — Possible unclosed block comment.`);
+    if (t.includes('sqrt(0') || t.includes('log(0')) log('warn', `${name}:${ln} — Possible domain error (sqrt/log of 0 or negative).`);
+    if (t.match(/\b(int|float|vec\d|mat\d)\s+\w+;/) && t.match(/;/) && !t.includes('=') && !t.includes('uniform')) log('hint', `${name}:${ln} — Uninitialized variable detected. Consider initializing to avoid undefined behavior.`);
+    if (t.includes('discard') && path.includes('vsh')) log('error', `${name}:${ln} — discard is only valid in fragment shaders.`);
+  });
+  if (!hasVersion) log('warn', `${name} — No #version directive found. Defaulting to #version 110 may cause compatibility issues.`);
+  declaredUniforms.forEach(u => {
+    if (!code.includes(u + ' ') && !code.includes(u + ')') && !code.includes(u + ',') && !code.includes(u + '.') && !code.includes(u + '[')) {
+      log('hint', `${name} — Uniform '${u}' declared but may be unused.`);
+    }
+  });
+  if (code.length === 0) log('info', `${name} — File is empty.`);
+  if (lines.length > 800) log('warn', `${name} — Large file (${lines.length} lines). Consider splitting into includes for maintainability.`);
+  const hasMain = code.includes('void main(');
+  if (!hasMain && ['fsh','vsh','gsh'].includes(getExt(path))) log('error', `${name} — No main() function found. Shader will not compile.`);
+  checkStructure();
+}
+function checkStructure() {
+  const needed = ['shaders/gbuffers_terrain.fsh', 'shaders/gbuffers_terrain.vsh'];
+  needed.forEach(f => {
+    if (!project.files[f]) {
+      // only hint once
+    }
+  });
+}
+
+// ─────────────────────────────────────────────────────
+// OUTPUT PANEL
+// ─────────────────────────────────────────────────────
+function log(type, msg) {
+  const time = new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  allLogs.push({ type, msg, time });
+  updateOutput();
+}
+function clearOutput() {
+  allLogs = [];
+  updateOutput();
+}
+function updateOutput() {
+  const el = document.getElementById('output-content');
+  const activeOut = document.querySelector('.out-tab.active')?.textContent?.trim()?.toLowerCase() || 'console';
+  let filtered = allLogs;
+  if (activeOut === 'warnings') filtered = allLogs.filter(l => l.type === 'warn');
+  else if (activeOut === 'errors') filtered = allLogs.filter(l => l.type === 'error');
+  else if (activeOut === 'hints') filtered = allLogs.filter(l => l.type === 'hint');
+  el.innerHTML = filtered.map(l => `
+    <div class="log-line ${l.type}">
+      <span class="log-badge ${l.type}">${l.type.toUpperCase()}</span>
+      <span class="log-time">${l.time}</span>
+      <span class="log-msg">${escHtml(l.msg)}</span>
+    </div>`).join('') || `<div style="color:var(--text-muted);padding:8px 0;font-size:11px">No entries</div>`;
+  el.scrollTop = el.scrollHeight;
+}
+function switchOutTab(name, el) {
+  document.querySelectorAll('.out-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  updateOutput();
+}
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ─────────────────────────────────────────────────────
+// SEARCH & REPLACE
+// ─────────────────────────────────────────────────────
+function toggleSearch() {
+  const p = document.getElementById('search-panel');
+  p.classList.toggle('open');
+  if (p.classList.contains('open')) document.getElementById('search-find').focus();
+}
+function searchHighlight() {
+  const term = document.getElementById('search-find').value;
+  const el = document.getElementById('search-count');
+  if (!term) { el.textContent = ''; searchMatches = []; return; }
+  const ed = document.getElementById('code-editor');
+  const code = ed.value;
+  const re = new RegExp(term.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'), 'gi');
+  const matches = [...code.matchAll(re)];
+  searchMatches = matches.map(m => m.index);
+  el.textContent = `${matches.length} match${matches.length !== 1 ? 'es' : ''}`;
+  searchIdx = 0;
+  if (matches.length) findNext(1);
+}
+function findNext(dir) {
+  if (!searchMatches.length) return;
+  searchIdx = (searchIdx + dir + searchMatches.length) % searchMatches.length;
+  const ed = document.getElementById('code-editor');
+  const pos = searchMatches[searchIdx];
+  const term = document.getElementById('search-find').value;
+  ed.setSelectionRange(pos, pos + term.length);
+  ed.focus();
+  const linesBefore = ed.value.substring(0, pos).split('\n').length - 1;
+  const lineH = parseFloat(getComputedStyle(ed).lineHeight);
+  ed.scrollTop = linesBefore * lineH - ed.clientHeight / 2;
+}
+function doReplace(all) {
+  const ed = document.getElementById('code-editor');
+  const find = document.getElementById('search-find').value;
+  const replace = document.getElementById('search-replace').value;
+  if (!find) return;
+  if (all) {
+    const re = new RegExp(find.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'), 'g');
+    const count = (ed.value.match(re) || []).length;
+    ed.value = ed.value.replace(re, replace);
+    log('ok', `Replaced ${count} occurrence(s) of "${find}" with "${replace}"`);
+  } else {
+    const pos = ed.value.indexOf(find, ed.selectionStart);
+    if (pos === -1) { log('warn', `"${find}" not found from cursor position.`); return; }
+    ed.value = ed.value.substring(0, pos) + replace + ed.value.substring(pos + find.length);
+    ed.setSelectionRange(pos, pos + replace.length);
+    log('ok', `Replaced one occurrence of "${find}"`);
+  }
+  if (activeTab) project.files[activeTab].content = ed.value;
+  updateLineNumbers(); updateStatus(); scheduleSave();
+  searchHighlight();
+}
+
+// ─────────────────────────────────────────────────────
+// FILE MANAGEMENT
+// ─────────────────────────────────────────────────────
+let newFileType = 'glsl';
+function selectType(type, el) {
+  newFileType = type;
+  document.querySelectorAll('.type-pill').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  const fn = document.getElementById('new-filename');
+  if (!fn.value || fn.value.indexOf('.') === -1) fn.value = 'untitled.' + type;
+}
+function createNewFile() {
+  let name = document.getElementById('new-filename').value.trim();
+  const folder = document.getElementById('new-folder').value;
+  if (!name) { alert('Enter a filename.'); return; }
+  if (!name.includes('.')) name += '.' + newFileType;
+  const path = folder ? folder + '/' + name : name;
+  if (project.files[path]) { alert('A file with that name already exists.'); return; }
+  project.files[path] = { content: getDefaultContent(name), dirty: false };
+  saveToStorage();
+  renderTree();
+  closeModal('newfile');
+  openTab(path);
+  log('ok', `Created ${path}`);
+  analyzeShader(true);
+}
+function getDefaultContent(name) {
+  const ext = getExt(name);
+  if (ext === 'fsh') return `#version 120\n\nuniform sampler2D gcolor;\nuniform sampler2D depthtex0;\n\nvarying vec2 texcoord;\n\nvoid main() {\n  vec4 color = texture2D(gcolor, texcoord);\n  \n  gl_FragColor = color;\n}\n`;
+  if (ext === 'vsh') return `#version 120\n\nvarying vec2 texcoord;\n\nvoid main() {\n  texcoord = (gl_TextureMatrix[0] * gl_MultiTexCoord0).xy;\n  gl_Position = ftransform();\n}\n`;
+  if (ext === 'gsh') return `#version 150 compatibility\n\n#extension GL_EXT_geometry_shader4 : enable\n\nlayout(triangles) in;\nlayout(triangle_strip, max_vertices = 3) out;\n\nvoid main() {\n  for (int i = 0; i < 3; i++) {\n    gl_Position = gl_in[i].gl_Position;\n    EmitVertex();\n  }\n  EndPrimitive();\n}\n`;
+  if (ext === 'json') return `{\n  "name": "My Shader Pack",\n  "description": "",\n  "version": "1.0.0"\n}\n`;
+  if (name === 'shaders.properties') return `# Shaders Properties\n\nshadowResolution=2048\nshadowDistance=96\nambientOcclusionLevel=1.0\n`;
+  return '';
+}
+function deleteFile(path) {
+  if (!confirm(`Delete ${path}?`)) return;
+  delete project.files[path];
+  if (activeTab === path) { activeTab = null; openTabs = openTabs.filter(p => p !== path); }
+  openTabs = openTabs.filter(p => p !== path);
+  saveToStorage(); renderTree(); renderTabs(); renderEditor();
+  log('info', `Deleted ${path}`);
+}
+function duplicateFile(path) {
+  const name = path.split('/').pop();
+  const folder = path.includes('/') ? path.substring(0, path.lastIndexOf('/')) : '';
+  const ext = getExt(name);
+  const base = name.replace(`.${ext}`, '');
+  const newName = base + '_copy.' + ext;
+  const newPath = folder ? folder + '/' + newName : newName;
+  project.files[newPath] = { content: project.files[path]?.content || '', dirty: false };
+  saveToStorage(); renderTree();
+  log('ok', `Duplicated to ${newPath}`);
+}
+
+let renamePath = null;
+function doRename() {
+  const newName = document.getElementById('rename-input').value.trim();
+  if (!newName || !renamePath) return;
+  const folder = renamePath.includes('/') ? renamePath.substring(0, renamePath.lastIndexOf('/')) : '';
+  const newPath = folder ? folder + '/' + newName : newName;
+  if (project.files[newPath]) { alert('File already exists.'); return; }
+  project.files[newPath] = project.files[renamePath];
+  delete project.files[renamePath];
+  if (activeTab === renamePath) activeTab = newPath;
+  openTabs = openTabs.map(p => p === renamePath ? newPath : p);
+  saveToStorage(); renderTree(); renderTabs(); renderEditor();
+  closeModal('rename');
+  log('ok', `Renamed to ${newPath}`);
+}
+
+// ─────────────────────────────────────────────────────
+// IMPORT / EXPORT
+// ─────────────────────────────────────────────────────
+function importFile() { document.getElementById('file-import').click(); }
+function handleFileImport(e) {
+  const files = Array.from(e.target.files);
+  files.forEach(file => {
+    const ext = getExt(file.name);
+    const isImg = ['png','jpg','jpeg','tga'].includes(ext);
+    const path = 'shaders/' + file.name;
+    if (isImg) {
+      const reader = new FileReader();
+      reader.onload = r => {
+        project.files[path] = { content: '', isImage: true, imageData: r.result, dirty: false };
+        saveToStorage(); renderTree();
+        log('ok', `Imported texture: ${file.name}`);
+      };
+      reader.readAsDataURL(file);
+    } else {
+      const reader = new FileReader();
+      reader.onload = r => {
+        project.files[path] = { content: r.result, dirty: false };
+        saveToStorage(); renderTree();
+        log('ok', `Imported ${file.name} (${formatBytes(r.result.length)})`);
+        analyzeShader(true);
+      };
+      reader.readAsText(file);
+    }
+  });
+  e.target.value = '';
+}
+function setupDragDrop() {
+  const overlay = document.getElementById('drop-overlay');
+  document.body.addEventListener('dragover', e => { e.preventDefault(); overlay.classList.add('active'); });
+  document.body.addEventListener('dragleave', e => { if (!e.relatedTarget) overlay.classList.remove('active'); });
+  document.body.addEventListener('drop', e => {
+    e.preventDefault(); overlay.classList.remove('active');
+    const files = Array.from(e.dataTransfer.files);
+    if (files.length) { document.getElementById('file-import').dispatchEvent(Object.assign(new Event('change'), { target: { files: e.dataTransfer.files, value: '' } })); }
+    files.forEach(file => {
+      const ext = getExt(file.name);
+      const isImg = ['png','jpg','jpeg','tga'].includes(ext);
+      const path = 'shaders/' + file.name;
+      if (isImg) {
+        const reader = new FileReader();
+        reader.onload = r => {
+          project.files[path] = { content: '', isImage: true, imageData: r.result, dirty: false };
+          saveToStorage(); renderTree(); log('ok', `Imported texture: ${file.name}`);
+        };
+        reader.readAsDataURL(file);
+      } else {
+        const reader = new FileReader();
+        reader.onload = r => {
+          project.files[path] = { content: r.result, dirty: false };
+          saveToStorage(); renderTree();
+          log('ok', `Imported ${file.name}`);
+          analyzeShader(true);
+        };
+        reader.readAsText(file);
+      }
+    });
+  });
+}
+async function exportZip() {
+  log('info', 'Building ZIP archive…');
+  const entries = [];
+  Object.entries(project.files).forEach(([path, f]) => {
+    if (f.isImage && f.imageData) {
+      const base64 = f.imageData.split(',')[1];
+      entries.push({ path, data: base64, isBase64: true });
+    } else {
+      entries.push({ path, data: f.content || '', isBase64: false });
+    }
+  });
+  const zip = buildZip(entries, project.name || 'MyShaderPack');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([zip], { type: 'application/zip' }));
+  a.download = (project.name || 'ShaderPack') + '.zip';
+  a.click();
+  log('ok', `Exported ${entries.length} file(s) as ${a.download}`);
+}
+function exportCurrentFile() {
+  if (!activeTab) { log('warn', 'No file open.'); return; }
+  const f = project.files[activeTab];
+  const name = activeTab.split('/').pop();
+  const blob = new Blob([f.content || ''], { type: 'text/plain' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = name;
+  a.click();
+  log('ok', `Exported ${name}`);
+}
+
+// ─── Minimal ZIP builder ────────────────────────────
+function buildZip(entries, rootName) {
+  const files = entries.map(e => {
+    const name = rootName + '/' + e.path;
+    const data = e.isBase64 ? base64ToBytes(e.data) : strToBytes(e.data);
+    return { name, data };
+  });
+  const parts = [];
+  const centralDir = [];
+  let offset = 0;
+  files.forEach(({ name, data }) => {
+    const nameBytes = strToBytes(name);
+    const crc = crc32(data);
+    const local = buildLocalHeader(nameBytes, data, crc);
+    parts.push(local, data);
+    centralDir.push(buildCentralHeader(nameBytes, data, crc, offset));
+    offset += local.length + data.length;
+  });
+  const cd = concat(centralDir);
+  const eocd = buildEOCD(files.length, cd.length, offset);
+  return concat([...parts, cd, eocd]);
+}
+function strToBytes(s) {
+  const enc = new TextEncoder();
+  return enc.encode(s);
+}
+function base64ToBytes(b64) {
+  const bin = atob(b64);
+  const arr = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+  return arr;
+}
+function concat(arrays) {
+  const total = arrays.reduce((s, a) => s + a.length, 0);
+  const out = new Uint8Array(total);
+  let pos = 0;
+  arrays.forEach(a => { out.set(a, pos); pos += a.length; });
+  return out;
+}
+function u16le(n) { return new Uint8Array([n & 0xff, (n >> 8) & 0xff]); }
+function u32le(n) { return new Uint8Array([n & 0xff, (n >> 8) & 0xff, (n >> 16) & 0xff, (n >> 24) & 0xff]); }
+function buildLocalHeader(name, data, crc) {
+  return concat([
+    new Uint8Array([0x50, 0x4B, 0x03, 0x04]),
+    u16le(20), u16le(0), u16le(0),
+    u16le(0), u16le(0),
+    u32le(crc), u32le(data.length), u32le(data.length),
+    u16le(name.length), u16le(0), name
+  ]);
+}
+function buildCentralHeader(name, data, crc, offset) {
+  return concat([
+    new Uint8Array([0x50, 0x4B, 0x01, 0x02]),
+    u16le(20), u16le(20), u16le(0), u16le(0),
+    u16le(0), u16le(0),
+    u32le(crc), u32le(data.length), u32le(data.length),
+    u16le(name.length), u16le(0), u16le(0),
+    u16le(0), u16le(0), u32le(0),
+    u32le(offset), name
+  ]);
+}
+function buildEOCD(numFiles, cdSize, cdOffset) {
+  return concat([
+    new Uint8Array([0x50, 0x4B, 0x05, 0x06]),
+    u16le(0), u16le(0),
+    u16le(numFiles), u16le(numFiles),
+    u32le(cdSize), u32le(cdOffset),
+    u16le(0)
+  ]);
+}
+function crc32(data) {
+  let crc = 0xFFFFFFFF;
+  for (let i = 0; i < data.length; i++) {
+    crc ^= data[i];
+    for (let j = 0; j < 8; j++) crc = (crc >>> 1) ^ (crc & 1 ? 0xEDB88320 : 0);
+  }
+  return (crc ^ 0xFFFFFFFF) >>> 0;
+}
+
+// ─────────────────────────────────────────────────────
+// TEXTURE VIEWER
+// ─────────────────────────────────────────────────────
+function openTexture(path) {
+  ctxTarget = path;
+  const f = project.files[path];
+  if (!f || !f.imageData) return;
+  document.getElementById('texture-modal-title').textContent = path.split('/').pop();
+  const canvas = document.getElementById('texture-canvas');
+  const img = new Image();
+  img.onload = () => {
+    canvas.width = img.naturalWidth;
+    canvas.height = img.naturalHeight;
+    canvas.style.height = Math.min(300, img.naturalHeight) + 'px';
+    canvas.getContext('2d').drawImage(img, 0, 0);
+    document.getElementById('texture-info').innerHTML = `
+      <div class="texture-info-item"><div class="ti-label">Width</div><div class="ti-val">${img.naturalWidth}px</div></div>
+      <div class="texture-info-item"><div class="ti-label">Height</div><div class="ti-val">${img.naturalHeight}px</div></div>
+      <div class="texture-info-item"><div class="ti-label">Format</div><div class="ti-val">${getExt(path).toUpperCase()}</div></div>
+      <div class="texture-info-item"><div class="ti-label">Ratio</div><div class="ti-val">${img.naturalWidth === img.naturalHeight ? '1:1' : img.naturalWidth + ':' + img.naturalHeight}</div></div>
+    `;
+  };
+  img.src = f.imageData;
+  openModal('texture');
+}
+
+// ─────────────────────────────────────────────────────
+// CONTEXT MENU
+// ─────────────────────────────────────────────────────
+function showCtxMenu(e, path) {
+  e.preventDefault();
+  ctxTarget = path;
+  const menu = document.getElementById('ctx-menu');
+  menu.style.left = e.clientX + 'px';
+  menu.style.top = e.clientY + 'px';
+  menu.classList.add('open');
+}
+function ctxAction(action) {
+  const path = ctxTarget;
+  document.getElementById('ctx-menu').classList.remove('open');
+  if (action === 'delete') { deleteFile(path); }
+  else if (action === 'duplicate') { duplicateFile(path); }
+  else if (action === 'rename') {
+    renamePath = path;
+    document.getElementById('rename-input').value = path.split('/').pop();
+    openModal('rename');
+  } else if (action === 'format') {
+    openTab(path);
+    setTimeout(() => formatCode(), 100);
+  }
+}
+document.addEventListener('click', e => {
+  if (!document.getElementById('ctx-menu').contains(e.target)) {
+    document.getElementById('ctx-menu').classList.remove('open');
+  }
+});
+
+// ─────────────────────────────────────────────────────
+// MODALS
+// ─────────────────────────────────────────────────────
+function openModal(id) {
+  if (id === 'newfile') {
+    const folderSel = document.getElementById('new-folder');
+    const folders = ['', ...project.folders];
+    folderSel.innerHTML = folders.map(f => `<option value="${f}">${f || '(root)'}</option>`).join('');
+    document.getElementById('new-filename').value = '';
+    newFileType = 'glsl';
+    document.querySelectorAll('.type-pill').forEach((p,i) => p.classList.toggle('active', i === 0));
+  }
+  document.getElementById('modal-' + id)?.classList.add('open');
+}
+function closeModal(id) {
+  document.getElementById('modal-' + id)?.classList.remove('open');
+}
+document.querySelectorAll('.modal-overlay').forEach(m => {
+  m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); });
+});
+
+// ─────────────────────────────────────────────────────
+// PRESETS
+// ─────────────────────────────────────────────────────
+const SNIPPETS = [
+  { id: 'bloom', name: 'Bloom Pass', desc: 'Gaussian bloom + threshold', code: `// Bloom - threshold + blur\nfloat bloomThreshold = 0.8;\nvec3 extractBright(vec3 color) {\n  float brightness = dot(color, vec3(0.2126, 0.7152, 0.0722));\n  return color * max(brightness - bloomThreshold, 0.0);\n}\nvec3 gaussianBlur(sampler2D tex, vec2 uv, vec2 dir) {\n  vec3 result = vec3(0.0);\n  float weights[5] = float[](0.2270, 0.1945, 0.1216, 0.0540, 0.0162);\n  for (int i = -4; i <= 4; i++) {\n    result += texture2D(tex, uv + dir * float(i)).rgb * weights[abs(i)];\n  }\n  return result;\n}\n` },
+  { id: 'rain', name: 'Rain Ripples', desc: 'Animated rain surface effect', code: `// Rain ripples on surfaces\nuniform float frameTimeCounter;\nfloat rainRipple(vec2 uv, float time) {\n  float r = length(uv);\n  float wave = sin(r * 20.0 - time * 8.0) * exp(-r * 3.0);\n  return wave * 0.5 + 0.5;\n}\nvec3 applyRain(vec3 normal, vec2 worldUV, float rainStrength) {\n  float ripple = rainRipple(fract(worldUV * 2.0) - 0.5, frameTimeCounter);\n  return normalize(normal + vec3(ripple * rainStrength * 0.2, 0.0, ripple * rainStrength * 0.2));\n}\n` },
+  { id: 'shadow', name: 'PCF Shadows', desc: 'Soft shadow sampling', code: `// PCF Soft Shadows\nuniform sampler2D shadowtex0;\nuniform sampler2D shadowtex1;\nuniform mat4 shadowModelView;\nuniform mat4 shadowProjection;\nfloat getShadow(vec3 worldPos, float bias) {\n  vec4 shadowPos = shadowProjection * shadowModelView * vec4(worldPos, 1.0);\n  shadowPos.xyz = shadowPos.xyz * 0.5 + 0.5;\n  float shadow = 0.0;\n  vec2 texelSize = 1.0 / vec2(textureSize(shadowtex0, 0));\n  for (int x = -2; x <= 2; x++) {\n    for (int y = -2; y <= 2; y++) {\n      float depth = texture2D(shadowtex0, shadowPos.xy + vec2(x, y) * texelSize).r;\n      shadow += shadowPos.z - bias > depth ? 0.0 : 1.0;\n    }\n  }\n  return shadow / 25.0;\n}\n` },
+  { id: 'fog', name: 'Volumetric Fog', desc: 'Height & distance fog', code: `// Volumetric Fog\nuniform float fogStart;\nuniform float fogEnd;\nuniform vec4 fogColor;\nfloat getFogFactor(float depth, float height) {\n  float distFog = clamp((depth - fogStart) / (fogEnd - fogStart), 0.0, 1.0);\n  float heightFog = exp(-max(height, 0.0) * 0.05);\n  return distFog * heightFog;\n}\nvec3 applyFog(vec3 color, float depth, float height) {\n  float fog = getFogFactor(depth, height);\n  return mix(color, fogColor.rgb, fog);\n}\n` },
+  { id: 'aces', name: 'ACES Tonemapping', desc: 'Film-quality tonemapper', code: `// ACES Filmic Tonemapping\nvec3 aces(vec3 x) {\n  float a = 2.51;\n  float b = 0.03;\n  float c = 2.43;\n  float d = 0.59;\n  float e = 0.14;\n  return clamp((x * (a * x + b)) / (x * (c * x + d) + e), 0.0, 1.0);\n}\nvec3 tonemap(vec3 hdrColor) {\n  hdrColor *= 0.6; // exposure\n  return pow(aces(hdrColor), vec3(1.0 / 2.2));\n}\n` },
+  { id: 'ssao', name: 'SSAO', desc: 'Screen space ambient occlusion', code: `// SSAO — Screen Space Ambient Occlusion\nuniform sampler2D depthtex0;\nuniform mat4 gbufferProjection;\nuniform mat4 gbufferProjectionInverse;\nvec3 getViewPos(vec2 uv, float depth) {\n  vec4 ndc = vec4(uv * 2.0 - 1.0, depth * 2.0 - 1.0, 1.0);\n  vec4 view = gbufferProjectionInverse * ndc;\n  return view.xyz / view.w;\n}\nfloat calcSSAO(vec2 uv) {\n  float depth = texture2D(depthtex0, uv).r;\n  vec3 pos = getViewPos(uv, depth);\n  float occlusion = 0.0;\n  for (int i = 0; i < 16; i++) {\n    vec2 offset = vec2(float(i % 4) - 1.5, float(i / 4) - 1.5) * 0.002;\n    float sampleDepth = texture2D(depthtex0, uv + offset).r;\n    vec3 samplePos = getViewPos(uv + offset, sampleDepth);\n    if (distance(pos, samplePos) < 0.5) {\n      occlusion += max(0.0, samplePos.z - pos.z) / 0.5;\n    }\n  }\n  return 1.0 - (occlusion / 16.0);\n}\n` },
+  { id: 'cel', name: 'Cel Shading', desc: 'Toon/cartoon outline + bands', code: `// Cel Shading\nfloat celShade(float light) {\n  if (light > 0.95) return 1.0;\n  if (light > 0.5) return 0.7;\n  if (light > 0.25) return 0.4;\n  return 0.2;\n}\nfloat detectEdge(sampler2D depthTex, vec2 uv) {\n  float texelW = 1.0 / 1920.0;\n  float texelH = 1.0 / 1080.0;\n  float d = texture2D(depthTex, uv).r;\n  float dR = texture2D(depthTex, uv + vec2(texelW, 0)).r;\n  float dD = texture2D(depthTex, uv + vec2(0, texelH)).r;\n  return step(0.001, abs(d - dR) + abs(d - dD));\n}\n` },
+  { id: 'dof', name: 'Depth of Field', desc: 'Bokeh blur by depth', code: `// Depth of Field\nuniform sampler2D depthtex0;\nuniform float far;\nfloat linearDepth(float depth) {\n  return (2.0 * 0.05) / (far + 0.05 - depth * (far - 0.05));\n}\nvec3 dofBlur(sampler2D colorTex, vec2 uv, float focusDepth) {\n  float depth = linearDepth(texture2D(depthtex0, uv).r);\n  float coc = abs(depth - focusDepth) * 12.0;\n  vec3 color = vec3(0.0);\n  float total = 0.0;\n  for (int i = 0; i < 16; i++) {\n    float angle = float(i) * 3.14159 * 2.0 / 16.0;\n    vec2 offset = vec2(cos(angle), sin(angle)) * coc * 0.001;\n    color += texture2D(colorTex, uv + offset).rgb;\n    total += 1.0;\n  }\n  return color / total;\n}\n` },
+  { id: 'motion', name: 'Motion Blur', desc: 'Velocity-based screen blur', code: `// Motion Blur\nuniform mat4 gbufferPreviousProjection;\nuniform mat4 gbufferPreviousModelView;\nuniform mat4 gbufferProjectionInverse;\nuniform mat4 gbufferModelViewInverse;\nuniform sampler2D depthtex0;\nvec2 getVelocity(vec2 uv) {\n  float depth = texture2D(depthtex0, uv).r;\n  vec4 ndc = vec4(uv * 2.0 - 1.0, depth * 2.0 - 1.0, 1.0);\n  vec4 worldPos = gbufferModelViewInverse * gbufferProjectionInverse * ndc;\n  worldPos /= worldPos.w;\n  vec4 prevPos = gbufferPreviousProjection * gbufferPreviousModelView * worldPos;\n  prevPos.xyz /= prevPos.w;\n  return (ndc.xy - prevPos.xy) * 0.5;\n}\nvec3 motionBlur(sampler2D tex, vec2 uv, int samples) {\n  vec2 vel = getVelocity(uv) * 0.3;\n  vec3 color = vec3(0.0);\n  for (int i = 0; i < samples; i++) {\n    vec2 offset = vel * (float(i) / float(samples - 1) - 0.5);\n    color += texture2D(tex, uv + offset).rgb;\n  }\n  return color / float(samples);\n}\n` },
+  { id: 'lut', name: 'LUT Color Grading', desc: '3D lookup table color grade', code: `// 3D LUT Color Grading\nuniform sampler3D colortex7; // your 3D LUT texture\nvec3 applyLUT(vec3 color, float lutSize) {\n  color = clamp(color, 0.0, 1.0);\n  color *= (lutSize - 1.0) / lutSize;\n  color += 0.5 / lutSize;\n  return texture(colortex7, color).rgb;\n}\n` },
+  { id: 'wave', name: 'Water Waves', desc: 'Animated vertex wave displacement', code: `// Water / Foliage Wave (Vertex Shader)\nuniform float frameTimeCounter;\nvec3 applyWave(vec3 worldPos, float speed, float strength) {\n  float wave = sin(worldPos.x * 0.5 + frameTimeCounter * speed)\n             + sin(worldPos.z * 0.5 + frameTimeCounter * speed * 0.7);\n  return worldPos + vec3(wave * strength, 0.0, wave * strength * 0.5);\n}\n` },
+  { id: 'stars', name: 'Star Field', desc: 'Procedural night sky stars', code: `// Procedural Star Field\nfloat hash21(vec2 p) {\n  p = fract(p * vec2(123.34, 456.21));\n  p += dot(p, p + 45.32);\n  return fract(p.x * p.y);\n}\nfloat stars(vec2 uv, float threshold) {\n  vec2 gv = fract(uv * 200.0) - 0.5;\n  vec2 id = floor(uv * 200.0);\n  float n = hash21(id);\n  if (n < threshold) return 0.0;\n  float star = 1.0 - length(gv) * 8.0;\n  return max(0.0, star * (n - threshold) / (1.0 - threshold));\n}\n` },
+];
+
+function renderSnippets() {
+  document.getElementById('snippet-grid').innerHTML = SNIPPETS.map(s =>
+    `<button class="snippet-btn" onclick="insertSnippet('${s.id}')">
+      <h5>${s.name}</h5>
+      <p>${s.desc}</p>
+    </button>`
+  ).join('');
+}
+renderSnippets();
+
+function insertSnippet(id) {
+  const s = SNIPPETS.find(x => x.id === id);
+  if (!s) return;
+  if (!activeTab) { log('warn', 'Open a GLSL file first to insert a snippet.'); closeModal('presets'); return; }
+  const ed = document.getElementById('code-editor');
+  const pos = ed.selectionStart;
+  ed.value = ed.value.substring(0, pos) + '\n' + s.code + ed.value.substring(pos);
+  if (activeTab) project.files[activeTab].content = ed.value;
+  ed.selectionStart = ed.selectionEnd = pos + s.code.length + 1;
+  updateLineNumbers(); updateStatus(); scheduleSave();
+  closeModal('presets');
+  log('ok', `Inserted snippet: ${s.name}`);
+}
+
+function selectPreset(id, el) {
+  selectedPreset = id;
+  document.querySelectorAll('.preset-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+const PRESET_FILES = {
+  basic: {
+    'shaders/gbuffers_terrain.vsh': null,
+    'shaders/gbuffers_terrain.fsh': null,
+    'shaders/gbuffers_water.vsh': null,
+    'shaders/gbuffers_water.fsh': null,
+    'shaders/composite.fsh': `#version 120\n\nuniform sampler2D gcolor;\nuniform sampler2D depthtex0;\n\nvarying vec2 texcoord;\n\nvoid main() {\n  vec4 color = texture2D(gcolor, texcoord);\n  // Post-processing goes here\n  gl_FragColor = color;\n}\n`,
+    'shaders/composite.vsh': null,
+    'shaders/final.fsh': `#version 120\n\nuniform sampler2D gcolor;\n\nvarying vec2 texcoord;\n\nvoid main() {\n  vec4 color = texture2D(gcolor, texcoord);\n  // Tonemapping / gamma here\n  gl_FragColor = vec4(pow(color.rgb, vec3(1.0/2.2)), color.a);\n}\n`,
+    'shaders/final.vsh': null,
+    'shaders/shaders.properties': `# Shaders Properties\nshadowResolution=2048\nshadowDistance=96\nambientOcclusionLevel=1.0\n`,
+  },
+  full: {
+    'shaders/gbuffers_terrain.vsh': null,
+    'shaders/gbuffers_terrain.fsh': null,
+    'shaders/gbuffers_water.vsh': null,
+    'shaders/gbuffers_water.fsh': null,
+    'shaders/gbuffers_entities.vsh': null,
+    'shaders/gbuffers_entities.fsh': null,
+    'shaders/gbuffers_hand.vsh': null,
+    'shaders/gbuffers_hand.fsh': null,
+    'shaders/gbuffers_skytextured.vsh': null,
+    'shaders/gbuffers_skytextured.fsh': null,
+    'shaders/shadow.vsh': `#version 120\n\nvoid main() {\n  gl_Position = ftransform();\n}\n`,
+    'shaders/shadow.fsh': `#version 120\n\nvoid main() {\n  gl_FragColor = vec4(1.0);\n}\n`,
+    'shaders/deferred.fsh': `#version 120\n\nuniform sampler2D colortex0;\nvarying vec2 texcoord;\nvoid main() {\n  gl_FragData[0] = texture2D(colortex0, texcoord);\n}\n`,
+    'shaders/deferred.vsh': null,
+    'shaders/composite.fsh': `#version 120\n\nuniform sampler2D gcolor;\nuniform sampler2D depthtex0;\nuniform sampler2D shadowtex0;\n\nvarying vec2 texcoord;\n\nvoid main() {\n  vec4 color = texture2D(gcolor, texcoord);\n  gl_FragColor = color;\n}\n`,
+    'shaders/composite.vsh': null,
+    'shaders/composite1.fsh': null,
+    'shaders/composite1.vsh': null,
+    'shaders/final.fsh': `#version 120\n\nuniform sampler2D gcolor;\nvarying vec2 texcoord;\nvoid main() {\n  vec4 color = texture2D(gcolor, texcoord);\n  gl_FragColor = vec4(pow(color.rgb, vec3(1.0/2.2)), color.a);\n}\n`,
+    'shaders/final.vsh': null,
+    'shaders/shaders.properties': `# Shaders Properties\nshadowResolution=4096\nshadowDistance=128\nambientOcclusionLevel=1.0\ndrawBuffers=0123\n`,
+    'shaders/lang/en_US.lang': `option.SHADOW_RES=Shadow Resolution\noption.BLOOM=Bloom\n`,
+  },
+  minimal: {
+    'shaders/gbuffers_terrain.vsh': null,
+    'shaders/gbuffers_terrain.fsh': null,
+    'shaders/final.fsh': `#version 120\n\nuniform sampler2D gcolor;\nvarying vec2 texcoord;\nvoid main() {\n  gl_FragColor = texture2D(gcolor, texcoord);\n}\n`,
+    'shaders/final.vsh': null,
+  },
+  custom: { 'shaders/.gitkeep': '' }
+};
+
+function applyPreset() {
+  const files = PRESET_FILES[selectedPreset];
+  if (!files) { closeModal('presets'); return; }
+  const count = Object.keys(files).filter(k => !project.files[k]).length;
+  if (Object.keys(project.files).length > 0) {
+    if (!confirm(`This will add ${count} new file(s) to your project. Existing files will not be overwritten. Continue?`)) return;
+  }
+  if (!project.folders.includes('shaders')) project.folders.push('shaders');
+  if (!project.folders.includes('shaders/lang')) project.folders.push('shaders/lang');
+  Object.entries(files).forEach(([path, content]) => {
+    if (!project.files[path]) {
+      project.files[path] = { content: content !== null ? content : getDefaultContent(path.split('/').pop()), dirty: false };
+    }
+  });
+  saveToStorage(); renderTree(); closeModal('presets');
+  log('ok', `Applied preset: ${selectedPreset}. Added ${count} file(s).`);
+  analyzeShader(true);
+  const firstFile = Object.keys(files)[0];
+  if (firstFile && project.files[firstFile]) openTab(firstFile);
+}
+
+// ─────────────────────────────────────────────────────
+// SETTINGS
+// ─────────────────────────────────────────────────────
+function toggleSetting(key) {
+  settings[key] = !settings[key];
+  document.getElementById('toggle-' + key).classList.toggle('on', settings[key]);
+  applySettings();
+}
+function applySettings() {
+  settings.tabsize = parseInt(document.getElementById('setting-tabsize').value);
+  settings.wrap = document.getElementById('toggle-wrap').classList.contains('on');
+  settings.analyze = document.getElementById('toggle-analyze').classList.contains('on');
+  settings.fmt = document.getElementById('toggle-fmt').classList.contains('on');
+  project.name = document.getElementById('setting-projname').value.trim() || 'MyShaderPack';
+  const ed = document.getElementById('code-editor');
+  ed.style.whiteSpace = settings.wrap ? 'pre-wrap' : 'pre';
+  localStorage.setItem('sf_settings', JSON.stringify(settings));
+}
+(function loadSettings() {
+  try {
+    const raw = localStorage.getItem('sf_settings');
+    if (raw) Object.assign(settings, JSON.parse(raw));
+    document.getElementById('setting-tabsize').value = settings.tabsize;
+    document.getElementById('toggle-wrap').classList.toggle('on', settings.wrap);
+    document.getElementById('toggle-analyze').classList.toggle('on', settings.analyze);
+    document.getElementById('toggle-fmt').classList.toggle('on', settings.fmt);
+    document.getElementById('setting-projname').value = project.name || 'MyShaderPack';
+  } catch(e) {}
+})();
+
+// ─────────────────────────────────────────────────────
+// SIDEBAR TOGGLE
+// ─────────────────────────────────────────────────────
+function toggleSidebar() {
+  const s = document.getElementById('sidebar');
+  if (window.innerWidth <= 768) {
+    s.classList.toggle('mobile-open');
+  } else {
+    s.classList.toggle('collapsed');
+    document.getElementById('sidebar-title').style.display = s.classList.contains('collapsed') ? 'none' : '';
+  }
+}
+
+// ─────────────────────────────────────────────────────
+// RESIZE HANDLERS
+// ─────────────────────────────────────────────────────
+function startOutputResize(e) {
+  e.preventDefault();
+  const panel = document.getElementById('output-panel');
+  const startY = e.clientY;
+  const startH = panel.offsetHeight;
+  function onMove(e) {
+    const newH = Math.max(80, Math.min(startH + (startY - e.clientY), window.innerHeight * 0.6));
+    panel.style.height = newH + 'px';
+  }
+  function onUp() {
+    document.removeEventListener('mousemove', onMove);
+    document.removeEventListener('mouseup', onUp);
+  }
+  document.addEventListener('mousemove', onMove);
+  document.addEventListener('mouseup', onUp);
+}
+function startVertSplit(e) {
+  e.preventDefault();
+  const sidebar = document.getElementById('sidebar');
+  const startX = e.clientX;
+  const startW = sidebar.offsetWidth;
+  function onMove(e) {
+    const newW = Math.max(120, Math.min(startW + (e.clientX - startX), 400));
+    sidebar.style.width = newW + 'px';
+  }
+  function onUp() {
+    document.removeEventListener('mousemove', onMove);
+    document.removeEventListener('mouseup', onUp);
+  }
+  document.addEventListener('mousemove', onMove);
+  document.addEventListener('mouseup', onUp);
+}
+
+// ─────────────────────────────────────────────────────
+// TOUCH SUPPORT for resize
+// ─────────────────────────────────────────────────────
+document.getElementById('output-resize').addEventListener('touchstart', e => {
+  const panel = document.getElementById('output-panel');
+  const startY = e.touches[0].clientY;
+  const startH = panel.offsetHeight;
+  function onMove(e) {
+    const newH = Math.max(80, Math.min(startH + (startY - e.touches[0].clientY), window.innerHeight * 0.6));
+    panel.style.height = newH + 'px';
+  }
+  function onEnd() {
+    document.removeEventListener('touchmove', onMove);
+    document.removeEventListener('touchend', onEnd);
+  }
+  document.addEventListener('touchmove', onMove, { passive: false });
+  document.addEventListener('touchend', onEnd);
+}, { passive: true });
+
+log('info', 'ShaderForge ready. Project auto-saves every keystroke.');
   </script>
 </body>
 
